@@ -3,7 +3,7 @@
 
 A minimalist error handling approach that enables unobtrusive yet rigorous error checking in C.
 Inspired by and builds upon [zf_log](https://github.com/wonder-mice/zf_log). Though designed to work
-well with `zf_log`, you do not need to use it to use `zf_check`.
+well with zf_log, you do not need to use it to use zf_check.
 
 # Purpose
 
@@ -27,3 +27,20 @@ instead of
     goto cleanup;
   }
 ```
+
+# Wishlist
+- `ZF_CHECK` macro for error handling
+  - variant to name your own goto
+  - variant that prints errno?
+- Support for multiple logging options
+  - zf_log
+  - basic stderr
+  - basic syslog
+- `ZF_CT_ASSERT` for compile-time asserts
+- `ZF_RT_ASSERT` for run-time asserts
+- Code examples for each
+- Improved README
+  - Usage
+  - Purpose, importance of defensive coding
+- Improved Makefile, or CMake
+- Module generator that uses template files to create modules preconfigured for zf_check
