@@ -43,4 +43,5 @@ instead of
   - Usage
   - Purpose, importance of defensive coding
 - Improved Makefile, or CMake
+- Run-time and build-time configuration
 - Module generator that uses template files to create modules preconfigured for zf_check
