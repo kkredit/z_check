@@ -1,3 +1,6 @@
+# Credit to Stewart Hildebrand for this Makefile template.
+# http://www.stew.dk/make
+
 CC=gcc
 CXX=g++
 
