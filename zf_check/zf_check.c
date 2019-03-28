@@ -43,6 +43,8 @@ typedef void (*ZfcLogFn_t)(ZfLogLevel_t level, const char *file, int line, const
  *                                                                       Data */
 static const char *m_moduleName = NULL;
 static ZfcLogFn_t m_zfcLogFunc = NULL;
+static ZfLogLevel_t m_logLevel;
+static ZfLogLevel_t m_logLevelOrig;
 static char m_message[MESSAGE_MAX_LEN] = { 0 };
 
 
@@ -57,12 +59,14 @@ static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const 
 
 /******************************************************************************
  *                                                         External functions */
-void ZfcLog_Open(ZfLogType_t logType, const char *moduleName) {
+void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleName) {
     if (NULL != m_zfcLogFunc) {
         ZFC_LOG(Z_WARN, "called ZfcLog_Open() twice in same module, %s", m_moduleName);
     }
     else {
         m_moduleName = (NULL != moduleName) ? moduleName : DEFAULT_MODULE_NAME;
+        m_logLevel = logLevel;
+        m_logLevelOrig = logLevel;
 
         switch (logType) {
             case Z_STDERR:
@@ -88,6 +92,14 @@ void ZfcLog_Open(ZfLogType_t logType, const char *moduleName) {
     }
 }
 
+void ZfcLog_LevelSet(ZfLogLevel_t logLevel) {
+    m_logLevel = logLevel;
+}
+
+void ZfcLog_LevelReset(void) {
+    m_logLevel = m_logLevelOrig;
+}
+
 void ZfcLog_Close(void) {
     if (ZfcLog_Syslog == m_zfcLogFunc) {
         closelog();
@@ -103,7 +115,7 @@ void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
     if (NULL == m_zfcLogFunc) {
         fprintf(stderr, "Error: May not use ZfcLog() before calling ZfcLog_Open()\n");
     }
-    else {
+    else if (m_logLevel >= level) {
         int rc;
         va_list args;
         va_start(args, format);

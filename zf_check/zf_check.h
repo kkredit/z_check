@@ -119,9 +119,22 @@ typedef enum ZfLogType_e
  * \post Logging is available
  *
  * \param[IN]   ZfLogType_t logType: Desired log type
+ * \param[IN]   ZfLogLevel_t logLevel: Desired log level (inclusive)
  * \param[IN]   const char * moduleName: Name of module
  */
-void ZfcLog_Open(ZfLogType_t logType, const char *moduleName);
+void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleName);
+
+/**
+ * \brief Set the log level
+ *
+ * \param[IN]   ZfLogLevel_t logLevel: Desired log level (inclusive)
+ */
+void ZfcLog_LevelSet(ZfLogLevel_t logLevel);
+
+/**
+ * \brief Reset the log level to the original value
+ */
+void ZfcLog_LevelReset(void);
 
 /**
  * \brief Closes and deconstructs the logger

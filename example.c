@@ -29,7 +29,7 @@ int main(void) {
     int status = 0;
 
     /* Open the logger. */
-    ZfcLog_Open(Z_STDOUT, "example");
+    ZfcLog_Open(Z_STDOUT, Z_INFO, "example");
 
     status = testExampleAsserts();
     ZF_CHECK(0 != status, -1, Z_ERR, "[X] testExampleAsserts failed!");
@@ -89,6 +89,15 @@ int testExampleLogs(void) {
 
     ZFC_LOG_IF(false, Z_INFO, "[X] this will not print");
     ZFC_LOG_IF(true, Z_INFO, "[+] this will print");
+
+
+    /* You can change the log level during runtime, which makes avoiding noise much easier. */
+
+    ZFC_LOG(Z_DEBUG, "[X] will not print");
+    ZfcLog_LevelSet(Z_DEBUG);
+    ZFC_LOG(Z_DEBUG, "[+] will print!");
+    ZfcLog_LevelReset();
+    ZFC_LOG(Z_DEBUG, "[X] will not print");
 
     return status;
 }
