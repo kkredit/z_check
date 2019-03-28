@@ -1,39 +1,60 @@
-
 # zf_check
+An error handling library to enable unobtrusive yet rigorous C error checking. Error checking in C
+is verbose and annoying, but it is also crucial for writing safe and secure programs. This library
+tries to lessen the pain.
 
-A minimalist error handling approach that enables unobtrusive yet rigorous error checking in C.
-Inspired by and builds upon [zf_log](https://github.com/wonder-mice/zf_log). Though designed to work
-well with zf_log, you do not need to use it to use zf_check.
+The goal of this library is to be as small and generally applicable as possible.
 
-# Purpose
+>Perfection is achieved not when there is nothing more to add, but when there is nothing left to
+take away.
 
-Correct coding in C is very difficult. Error handling in C is painfully manual. This module is
-designed to encourage good coding practices by lowering the barrier to perform thorough error
-handling.
+\- Antoine de Saint-Exupery
+
+
+# Features
+- Compiles with `-std=c99` and strict warnings enabled
+- Run-time and build-time library configuration
+- Run-time modification of logging levels (helps with noise)
+- `ZF_CT_ASSERT`: simple compile-time asserts
+- `ZF_RT_ASSERT`: simple run-time asserts (friendly wrapper around `assert()`)
+- `ZF_CHECK` and variants: one-liner error check, logging command, and goto
+- `ZFC_LOG` and variants: one-liner logging command, configurable to
+    - stdout
+    - stderr
+    - syslog
+    - zf_log (wip)
+
 
 # Example
+See [example.c](examples/example.c), which exercises most of the library's
+functionality.
 
-(TODO create better examples)
+As a basic example, this code:
 ```c
-  int rv = foo();
-  ZF_CHECK(0 > rv, ZF_CRIT, ZF_CLEANUP, false, "foo returned a bad value! (%d)", rv);
+    int rv = foo();
+    ZF_CHECK(0 < rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
 ```
-instead of
+is equivalent to:
 ```c
-  int rv = foo();
-  if (0 > rv) {
-    ZF_LOG(ZF_CRITICAL, "foo returned a bad value! (%d)", rv);
-    success = false;
-    goto cleanup;
+    int rv = foo();
+    if (0 > rv) {
+      ZFC_LOG(ZF_LOG_ERROR, "foo returned a bad value! (%d)", rv);
+      status = -1;
+      goto cleanup;
   }
 ```
+where `ZFC_LOG()` itself encapsulates non-trivial logging functionality.
+
 
 # Wishlist
-- ZF_CHECK variant that doesn't require `status`
-- Support for multiple logging options
-  - zf_log
+- ZF_CHECK variant that doesn't require `status` variable
+- Logging support for zf_log
 - Improved README
   - Usage
-  - Purpose, importance of defensive coding
-- Improved Makefile, or CMake
-- Module generator that uses template files to create modules preconfigured for zf_check
+  - Backgorund: more on purpose, importance of defensive coding, references to coding practices
+- Improve Makefile, move to CMake
+
+
+# Name
+The `zf` in `zf_check` comes from [zf_log](https://github.com/wonder-mice/zf_log), a nice logging
+library that zf_check supports as one of its logging options.

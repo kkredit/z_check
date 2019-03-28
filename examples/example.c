@@ -98,7 +98,8 @@ int testExampleLogs(void) {
     ZFC_LOG_IF(true, Z_INFO, "[+] this will print");
 
 
-    /* You can change the log level during runtime, which makes avoiding noise much easier. */
+    /* You can change the log level during runtime, which makes avoiding noise much easier.
+     * This works regardless of run-time or compile-time library configuration. */
 
     ZFC_LOG(Z_DEBUG, "[X] will not print");
     ZfcLog_LevelSet(Z_DEBUG);
