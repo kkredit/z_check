@@ -29,14 +29,20 @@ extern "C"
 /******************************************************************************
  *                                                              Configuration */
 #define ZF_CHECK_HAS_SYSLOG
+//#define ZF_CHECK_HAS_ZF_LOG
+#ifdef ZF_CHECK_HAS_ZF_LOG
+    #error "zf_log logging option not implemented yet"
+#endif
 
 //#define ZF_CHECK_STATIC_CONFIG
 #ifdef ZF_CHECK_STATIC_CONFIG
     #undef ZF_CHECK_HAS_SYSLOG
 
-    #define Z_ZFLOG     0
+    #define Z_STDOUT    0   /* same as printf() */
     #define Z_STDERR    1
-    #define Z_STDOUT    2   /* same as printf() */
+    #ifdef ZF_CHECK_HAS_ZF_LOG
+    #define Z_ZFLOG     2
+    #endif
 
     #define ZF_CHECK_MODULE_NAME        "module_static"
     #define ZF_CHECK_LOG_FUNC           Z_STDOUT
@@ -123,9 +129,11 @@ typedef enum ZfLogLevel_e
 #ifndef ZF_CHECK_STATIC_CONFIG
 typedef enum ZfLogType_e
 {
-    Z_ZFLOG = 0,
+    Z_STDOUT = 0, /* same as printf() */
     Z_STDERR,
-    Z_STDOUT, /* same as printf() */
+#ifdef ZF_CHECK_HAS_ZF_LOG
+    Z_ZFLOG,
+#endif
 #ifdef ZF_CHECK_HAS_SYSLOG
     Z_SYSLOG,
 #endif

@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#ifdef ZF_CHECK_HAS_ZF_LOG
+#define ZF_LOG_DEF_LEVEL ZF_LOG_VERBOSE
+#include "zf_log/zf_log.h"
+#endif
 #ifdef ZF_CHECK_HAS_SYSLOG
 #include <syslog.h>
 #endif
@@ -34,6 +38,15 @@
           (Z_INFO   == (level) ? "INFO" : \
            (Z_DEBUG  == (level) ? "DEBUG" : "UNKNOWN_LEVEL"))))))))
 #define ZFL2SYSLOG_LEVEL(level) ((int)level)
+#define ZFL2ZFLOG_LEVEL(level) \
+    (Z_EMERG  == (level) ? ZF_LOG_FATAL : \
+     (Z_ALERT  == (level) ? ZF_LOG_FATAL : \
+      (Z_CRIT   == (level) ? ZF_LOG_ERROR : \
+       (Z_ERR    == (level) ? ZF_LOG_ERROR : \
+        (Z_WARN   == (level) ? ZF_LOG_WARN : \
+         (Z_NOTICE == (level) ? ZF_LOG_INFO : \
+          (Z_INFO   == (level) ? ZF_LOG_DEBUG : \
+           (Z_DEBUG  == (level) ? ZF_LOG_VERBOSE : ZF_LOG_NONE))))))))
 
 
 /******************************************************************************
@@ -66,14 +79,14 @@ static ZfLogLevel_t m_logLevelOrig;
 #define FUNC_USED  __attribute__((unused))
 
 static const char *m_moduleName = ZF_CHECK_MODULE_NAME;
-#if ZF_CHECK_LOG_FUNC == Z_ZFLOG
-    #error "zf_log not yet implemented"
+#if ZF_CHECK_LOG_FUNC == Z_STDOUT
+    #define m_zfcLogFunc ZfcLog_StdOut
 #elif ZF_CHECK_LOG_FUNC == Z_STDERR
     #define m_zfcLogFunc ZfcLog_StdErr
-#elif ZF_CHECK_LOG_FUNC == Z_STDOUT
-    #define m_zfcLogFunc ZfcLog_StdOut
+#elif ZF_CHECK_LOG_FUNC == Z_ZFLOG
+    #define m_zfcLogFunc ZfcLog_ZfLog
 #else
-    #define "invalid ZF_CHECK_LOG_FUNC"
+    #error "invalid ZF_CHECK_LOG_FUNC"
 #endif
 static ZfLogLevel_t m_logLevel = ZF_CHECK_INIT_LOG_LEVEL;
 static ZfLogLevel_t m_logLevelOrig = ZF_CHECK_INIT_LOG_LEVEL;
@@ -89,6 +102,9 @@ static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char 
                                   const char *func);
 static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+#ifdef ZF_CHECK_HAS_ZF_LOG
+static void ZfcLog_ZfLog(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+#endif
 #ifdef ZF_CHECK_HAS_SYSLOG
 static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 #endif
@@ -114,6 +130,12 @@ void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleN
             case Z_STDOUT:
                 m_zfcLogFunc = ZfcLog_StdOut;
                 break;
+
+#ifdef ZF_CHECK_HAS_ZF_LOG
+            case Z_ZFLOG:
+                m_zfcLogFunc = ZfcLog_ZfLog;
+                break;
+#endif
 
 #ifdef ZF_CHECK_HAS_SYSLOG
             case Z_SYSLOG:
@@ -187,13 +209,19 @@ static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char 
             m_moduleName, ZFL_STR(level), file, line, func, m_message);
 }
 
+static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) {
+    ZfcLog_StdFile(stdout, level, file, line, func);
+}
+
 static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func) {
     ZfcLog_StdFile(stderr, level, file, line, func);
 }
 
-static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) {
-    ZfcLog_StdFile(stdout, level, file, line, func);
+#ifdef ZF_CHECK_HAS_ZF_LOG
+static void ZfcLog_ZfLog(ZfLogLevel_t level, const char *file, int line, const char *func) {
+    ZF_LOG_WRITE(ZFL2ZFLOG_LEVEL(level), "", "%s:%d:%s: %s", file, line, func, m_message);
 }
+#endif
 
 #ifdef ZF_CHECK_HAS_SYSLOG
 static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) {

@@ -18,7 +18,7 @@ take away.
 - `ZF_CT_ASSERT`: simple compile-time asserts
 - `ZF_RT_ASSERT`: simple run-time asserts (friendly wrapper around `assert()`)
 - `ZF_CHECK` and variants: one-liner error check, logging command, and goto
-- `ZFC_LOG` and variants: one-liner logging command, configurable to
+- `ZFC_LOG` and variants: one-liner logging command, configurably printing to
     - stdout
     - stderr
     - syslog
