@@ -43,10 +43,43 @@ typedef void (*ZfcLogFn_t)(ZfLogLevel_t level, const char *file, int line, const
 
 /******************************************************************************
  *                                                                       Data */
+#ifndef ZF_CHECK_STATIC_CONFIG
+
+/* Dynamically configured */
 static const char *m_moduleName = NULL;
 static ZfcLogFn_t m_zfcLogFunc = NULL;
 static ZfLogLevel_t m_logLevel;
 static ZfLogLevel_t m_logLevelOrig;
+
+#define FUNC_USED
+
+#else /* ZF_CHECK_STATIC_CONFIG */
+
+/* Statically configured */
+#if !defined(ZF_CHECK_MODULE_NAME) || !defined(ZF_CHECK_LOG_FUNC) || !defined(ZF_CHECK_INIT_LOG_LEVEL)
+    #error "Must fully define ZF_CHECK static configuration."
+#endif
+#if defined(ZF_CHECK_HAS_SYSLOG)
+    #error "Syslog version of ZF_CHECK requires dynamic configuration"
+#endif
+
+#define FUNC_USED  __attribute__((unused))
+
+static const char *m_moduleName = ZF_CHECK_MODULE_NAME;
+#if ZF_CHECK_LOG_FUNC == Z_ZFLOG
+    #error "zf_log not yet implemented"
+#elif ZF_CHECK_LOG_FUNC == Z_STDERR
+    #define m_zfcLogFunc ZfcLog_StdErr
+#elif ZF_CHECK_LOG_FUNC == Z_STDOUT
+    #define m_zfcLogFunc ZfcLog_StdOut
+#else
+    #define "invalid ZF_CHECK_LOG_FUNC"
+#endif
+static ZfLogLevel_t m_logLevel = ZF_CHECK_INIT_LOG_LEVEL;
+static ZfLogLevel_t m_logLevelOrig = ZF_CHECK_INIT_LOG_LEVEL;
+
+#endif /* ZF_CHECK_STATIC_CONFIG */
+
 static char m_message[MESSAGE_MAX_LEN] = { 0 };
 
 
@@ -54,15 +87,16 @@ static char m_message[MESSAGE_MAX_LEN] = { 0 };
  *                                                      Function declarations */
 static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char *file, int line,
                                   const char *func);
-static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func);
-static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func);
+static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 #ifdef ZF_CHECK_HAS_SYSLOG
-static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func);
+static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 #endif
 
 
 /******************************************************************************
  *                                                         External functions */
+#ifndef ZF_CHECK_STATIC_CONFIG
 void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleName) {
     if (NULL != m_zfcLogFunc) {
         ZFC_LOG(Z_WARN, "called ZfcLog_Open() twice in same module, %s", m_moduleName);
@@ -98,14 +132,6 @@ void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleN
     }
 }
 
-void ZfcLog_LevelSet(ZfLogLevel_t logLevel) {
-    m_logLevel = logLevel;
-}
-
-void ZfcLog_LevelReset(void) {
-    m_logLevel = m_logLevelOrig;
-}
-
 void ZfcLog_Close(void) {
 #ifdef ZF_CHECK_HAS_SYSLOG
     if (ZfcLog_Syslog == m_zfcLogFunc) {
@@ -117,13 +143,25 @@ void ZfcLog_Close(void) {
     m_moduleName = NULL;
     memset(m_message, 0, sizeof(m_message));
 }
+#endif /* ZF_CHECK_STATIC_CONFIG */
+
+void ZfcLog_LevelSet(ZfLogLevel_t logLevel) {
+    m_logLevel = logLevel;
+}
+
+void ZfcLog_LevelReset(void) {
+    m_logLevel = m_logLevelOrig;
+}
 
 void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
             const char *format, ...) {
+#ifndef ZF_CHECK_STATIC_CONFIG
     if (NULL == m_zfcLogFunc) {
         fprintf(stderr, "Error: May not use ZfcLog() before calling ZfcLog_Open()\n");
     }
-    else if (m_logLevel >= level) {
+    else
+#endif /* ZF_CHECK_STATIC_CONFIG */
+    if (m_logLevel >= level) {
         int rc;
         va_list args;
         va_start(args, format);

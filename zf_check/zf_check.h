@@ -30,6 +30,19 @@ extern "C"
  *                                                              Configuration */
 #define ZF_CHECK_HAS_SYSLOG
 
+//#define ZF_CHECK_STATIC_CONFIG
+#ifdef ZF_CHECK_STATIC_CONFIG
+    #undef ZF_CHECK_HAS_SYSLOG
+
+    #define Z_ZFLOG     0
+    #define Z_STDERR    1
+    #define Z_STDOUT    2   /* same as printf() */
+
+    #define ZF_CHECK_MODULE_NAME        "module"
+    #define ZF_CHECK_LOG_FUNC           Z_STDOUT
+    #define ZF_CHECK_INIT_LOG_LEVEL     Z_INFO
+#endif /* ZF_CHECK_STATIC_CONFIG */
+
 
 /******************************************************************************
  *                                                                    Defines */
@@ -107,6 +120,7 @@ typedef enum ZfLogLevel_e
     Z_DEBUG       /* debug-level messages */
 } ZfLogLevel_t;
 
+#ifndef ZF_CHECK_STATIC_CONFIG
 typedef enum ZfLogType_e
 {
     Z_ZFLOG = 0,
@@ -116,11 +130,13 @@ typedef enum ZfLogType_e
     Z_SYSLOG
 #endif
 } ZfLogType_t;
+#endif
 
 
 /******************************************************************************
  *                                                      Function declarations */
 
+#ifndef ZF_CHECK_STATIC_CONFIG
 /**
  * \brief Opens and initializes the logger
  *
@@ -133,6 +149,15 @@ typedef enum ZfLogType_e
 void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleName);
 
 /**
+ * \brief Closes and deconstructs the logger
+ *
+ * \pre Open logger with ZfcLog_Open
+ * \post Logging is no longer available
+ */
+void ZfcLog_Close(void);
+#endif /* ZF_CHECK_STATIC_CONFIG */
+
+/**
  * \brief Set the log level
  *
  * \param[IN]   ZfLogLevel_t logLevel: Desired log level (inclusive)
@@ -143,14 +168,6 @@ void ZfcLog_LevelSet(ZfLogLevel_t logLevel);
  * \brief Reset the log level to the original value
  */
 void ZfcLog_LevelReset(void);
-
-/**
- * \brief Closes and deconstructs the logger
- *
- * \pre Open logger with ZfcLog_Open
- * \post Logging is no longer available
- */
-void ZfcLog_Close(void);
 
 /**
  * \brief Write to the log
