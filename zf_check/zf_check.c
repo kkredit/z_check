@@ -1,7 +1,7 @@
 /**
- * \file
+ * \file zf_check.c
  *
- * \brief
+ * \brief Implement zf_check library logging functionality.
  * \details
  *
  * \copyright Copyright (c) 2019, Kevin Kredit.
