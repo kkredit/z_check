@@ -75,7 +75,7 @@ extern "C"
     ZfcLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 
 /**
- * \brief Cnoditionally log a message
+ * \brief Conditionally log a message
  */
 #define ZFC_LOG_IF(condition, level, ...) \
     do { \
