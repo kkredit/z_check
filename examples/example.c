@@ -50,7 +50,7 @@ int main(void) {
     ZFC_LOG(Z_ERR, "[X] this will not print");
 
     /* Use 'cleanup' tag to mark the end of the function, including actual clean up code. */
- cleanup:
+cleanup:
     ZFC_LOG_IF(0 != status, Z_INFO, "[+] returning");
     ZfcLog_Close();
     return status;
@@ -123,7 +123,7 @@ int testExampleChecks(void) {
 
     ZF_CHECK(false, -1, Z_ERR, "[X] this will not occur");
 
- cleanup:
+cleanup:
     return status;
 }
 
@@ -140,9 +140,9 @@ int testExampleCheckGs(void) {
     ZF_CHECKG(true, err2, -2, Z_ERR, "[+] this will occur");
 
     return status;
- err2:
+err2:
     /* err2 specific cleanup steps */
- err1:
+err1:
     /* err1 specific cleanup steps */
     return status;
 }
