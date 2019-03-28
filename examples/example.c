@@ -29,9 +29,15 @@ static int testExampleCheckGs(void);
 int main(void) {
     int status = 0;
 
-    /* Open the logger. */
-    ZfcLog_Open(Z_STDOUT, Z_INFO, "example");
+    /* Open the logger.
+     *
+     * zf_log supports static as well as dynamic configuration. The Open() and Close() functions
+     * are for dynamic (runtime) configuration. To try static configuration, remove or comment-
+     * out `ZfcLog_Open()` and `ZfcLog_cClose()`, then define `ZF_CHECK_STATIC_CONFIG` in
+     * zf_check.h. */
+    ZfcLog_Open(Z_STDOUT, Z_INFO, "example_dynamic");
 
+    /* Try out the features. */
     status = testExampleAsserts();
     ZF_CHECK(0 != status, -1, Z_ERR, "[X] testExampleAsserts failed!");
 
@@ -134,16 +140,16 @@ int testExampleCheckGs(void) {
      *
      * This is the same as ZF_CHECK, except it lets you define the 'goto' tag. */
 
-    /* ... some steps... */
+    /* e.g., malloc Thing1 */
     ZF_CHECKG(false, err1, -1, Z_ERR, "[X] this not will occur");
-    /* ... some more steps... */
+    /* e.g., malloc Thing2 */
     ZF_CHECKG(true, err2, -2, Z_ERR, "[+] this will occur");
 
     return status;
 err2:
-    /* err2 specific cleanup steps */
+    /* err2 specific cleanup steps, e.g. free Thing2 */
 err1:
-    /* err1 specific cleanup steps */
+    /* err1 specific cleanup steps, e.g. free Thing1 */
     return status;
 }
 

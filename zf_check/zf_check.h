@@ -38,7 +38,7 @@ extern "C"
     #define Z_STDERR    1
     #define Z_STDOUT    2   /* same as printf() */
 
-    #define ZF_CHECK_MODULE_NAME        "module"
+    #define ZF_CHECK_MODULE_NAME        "module_static"
     #define ZF_CHECK_LOG_FUNC           Z_STDOUT
     #define ZF_CHECK_INIT_LOG_LEVEL     Z_INFO
 #endif /* ZF_CHECK_STATIC_CONFIG */
@@ -127,7 +127,7 @@ typedef enum ZfLogType_e
     Z_STDERR,
     Z_STDOUT, /* same as printf() */
 #ifdef ZF_CHECK_HAS_SYSLOG
-    Z_SYSLOG
+    Z_SYSLOG,
 #endif
 } ZfLogType_t;
 #endif
