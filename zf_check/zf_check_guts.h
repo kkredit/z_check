@@ -7,6 +7,7 @@
  * use only.
  *
  * \copyright Copyright (c) 2019, Kevin Kredit.
+ * \license MIT
  */
 
 #ifndef ZF_CHECK_GUTS_H
