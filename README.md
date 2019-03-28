@@ -29,16 +29,9 @@ instead of
 ```
 
 # Wishlist
-- `ZF_CHECK` macro for error handling
-  - variant to name your own goto
-  - variant that prints errno?
+- ZF_CHECK variant that doesn't require `status`
 - Support for multiple logging options
   - zf_log
-  - basic stderr
-  - basic syslog
-- `ZF_CT_ASSERT` for compile-time asserts
-- `ZF_RT_ASSERT` for run-time asserts
-- Code examples for each
 - Improved README
   - Usage
   - Purpose, importance of defensive coding
