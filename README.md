@@ -12,7 +12,6 @@ take away.
 
 
 # Features
-- Compiles with `-std=c99` and strict warnings enabled
 - Run-time and build-time library configuration
 - Run-time modification of logging levels (helps with noise)
 - `ZF_CT_ASSERT`: simple compile-time asserts
@@ -23,6 +22,7 @@ take away.
     - stderr
     - syslog
     - zf_log (wip)
+- Compiles with `-std=c99` and strict warnings enabled
 
 
 # Example
@@ -31,27 +31,26 @@ functionality.
 
 As a basic example, this code:
 ```c
-    int rv = foo();
-    ZF_CHECK(0 < rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
+  int rv = foo();
+  ZF_CHECK(0 < rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
 ```
 is equivalent to:
 ```c
-    int rv = foo();
-    if (0 > rv) {
-      ZFC_LOG(ZF_LOG_ERROR, "foo returned a bad value! (%d)", rv);
-      status = -1;
-      goto cleanup;
+  int rv = foo();
+  if (0 > rv) {
+    ZFC_LOG(ZF_LOG_ERROR, "foo returned a bad value! (%d)", rv);
+    status = -1;
+    goto cleanup;
   }
 ```
 where `ZFC_LOG()` itself encapsulates non-trivial logging functionality.
 
 
 # Wishlist
-- ZF_CHECK variant that doesn't require `status` variable
-- Logging support for zf_log
-- Improved README
-  - Usage
-  - Backgorund: more on purpose, importance of defensive coding, references to coding practices
+- `ZF_CHECK` variant that doesn't require `status` variable
+- Logging support for zf_log (wip)
+- Background section in README: purpose, importance of defensive coding, good practices
+- Example of some real file, before and after
 - Improve Makefile, move to CMake
 
 
