@@ -2,7 +2,7 @@
 TARGET   := prog
 SRCDIR   := .
 ZFLOG_DIR := zf_log
-BINDIR   := bin
+BINDIR   := build
 
 WARNINGS := -Wall -Wextra
 INC_DIRS := -I. -Izf_log
