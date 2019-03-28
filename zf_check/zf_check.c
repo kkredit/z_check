@@ -11,11 +11,13 @@
 /******************************************************************************
  *                                                                 Inclusions */
 #include "zf_check.h"
-#include <syslog.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#ifdef ZF_CHECK_HAS_SYSLOG
+#include <syslog.h>
+#endif
 
 
 /******************************************************************************
@@ -54,7 +56,9 @@ static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char 
                                   const char *func);
 static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func);
 static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func);
+#ifdef ZF_CHECK_HAS_SYSLOG
 static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func);
+#endif
 
 
 /******************************************************************************
@@ -77,10 +81,12 @@ void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleN
                 m_zfcLogFunc = ZfcLog_StdOut;
                 break;
 
+#ifdef ZF_CHECK_HAS_SYSLOG
             case Z_SYSLOG:
                 openlog(m_moduleName, LOG_CONS, LOG_LOCAL0);
                 m_zfcLogFunc = ZfcLog_Syslog;
                 break;
+#endif
 
             default:
                 /* don't have ZFC_LOG setup yet to use */
@@ -101,9 +107,11 @@ void ZfcLog_LevelReset(void) {
 }
 
 void ZfcLog_Close(void) {
+#ifdef ZF_CHECK_HAS_SYSLOG
     if (ZfcLog_Syslog == m_zfcLogFunc) {
         closelog();
     }
+#endif
 
     m_zfcLogFunc = NULL;
     m_moduleName = NULL;
@@ -149,7 +157,9 @@ static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const 
     ZfcLog_StdFile(stdout, level, file, line, func);
 }
 
+#ifdef ZF_CHECK_HAS_SYSLOG
 static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) {
     syslog(ZFL2SYSLOG_LEVEL(level), "[%s] %s:%d:%s: %s", ZFL_STR(level), file, line, func, m_message);
 }
+#endif
 

@@ -26,6 +26,11 @@ extern "C"
 
 
 /******************************************************************************
+ *                                                              Configuration */
+#define ZF_CHECK_HAS_SYSLOG
+
+
+/******************************************************************************
  *                                                                    Defines */
 #define ZF_CT_ASSERT(condition) ZF_CT_ASSERT_GUTS(condition)
 
@@ -106,7 +111,9 @@ typedef enum ZfLogType_e
     Z_ZFLOG = 0,
     Z_STDERR,
     Z_STDOUT, /* same as printf() */
+#ifdef ZF_CHECK_HAS_SYSLOG
     Z_SYSLOG
+#endif
 } ZfLogType_t;
 
 
