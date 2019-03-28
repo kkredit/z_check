@@ -42,10 +42,19 @@ extern "C"
 #define ZF_CT_ASSERT_GUTS(cond) ZF_CT_ASSERT_GUTS_LINE(cond, __LINE__)
 
 /**
+ * \brief ZF_CHECK helper; log message and assignment var
+ */
+#define ZF_CHECK_COMMON(setvar, newval, level, ...) \
+    do { \
+        ZFC_LOG(level, __VA_ARGS__); \
+        setvar = newval; \
+    } while(0)
+
+/**
  * \brief The "goto" version of ZF_CHECK
  *
- * \post If condition is true, ZF_CHECK_EXT_CONT is called and execution jumps
- *       to the 'goto' label
+ * \post If condition is true, ZF_CHECK_COMMON is called and execution jumps to
+ *       the 'goto' label
  *
  * \param[IN]   bool condition: statement that evaluates to true if error is
  *                      present
@@ -57,7 +66,7 @@ extern "C"
 #define ZF_CHECK_EXT_GOTO(condition, label, setvar, newval, level, ...) \
     do { \
         if (condition) { \
-            ZF_CHECK_EXT_CONT(1, setvar, newval, level, __VA_ARGS__); \
+            ZF_CHECK_COMMON(setvar, newval, level, __VA_ARGS__); \
             goto label; \
         } \
     } while(0)
@@ -65,7 +74,7 @@ extern "C"
 /**
  * \brief The "continue" version of ZF_CHECK
  *
- * \post If condition is true, message is logged and var assignment occurs
+ * \post If condition is true, ZF_CHECK_COMMON is called
  *
  * \param[IN]   bool condition: statement that evaluates to true if error is
  *                      present
@@ -77,8 +86,7 @@ extern "C"
 #define ZF_CHECK_EXT_CONT(condition, setvar, newval, level, ...) \
     do { \
         if (condition) { \
-            ZFC_LOG(level, __VA_ARGS__); \
-            setvar = newval; \
+            ZF_CHECK_COMMON(setvar, newval, level, __VA_ARGS__); \
         } \
     } while(0)
 
