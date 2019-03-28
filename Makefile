@@ -6,7 +6,7 @@ CXX=g++
 
 SRC:= \
 	zf_check/zf_check.c \
-	example.c
+	examples/example.c
 INCDIRS:= \
 	. \
 	zf_log \
