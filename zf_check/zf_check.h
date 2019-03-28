@@ -10,8 +10,8 @@
  * \copyright Copyright (c) 2019, Kevin Kredit.
  */
 
-#ifndef TPL_PUBLIC_H
-#define	TPL_PUBLIC_H
+#ifndef ZF_CHECK_H
+#define ZF_CHECK_H
 
 #ifdef __cplusplus
 extern "C"
@@ -20,55 +20,65 @@ extern "C"
 
 /******************************************************************************
  *                                                                 Inclusions */
+#include "zf_check_guts.h"
 #include <string.h>
+#include <assert.h>
 
 
 /******************************************************************************
  *                                                                    Defines */
+#define ZF_CT_ASSERT(condition) ZF_CT_ASSERT_GUTS(condition)
+
+#define ZF_RT_ASSERT(condition, ...) \
+    do { \
+        if (!(condition)) { \
+            ZFC_LOG(Z_EMERG, "ZF_RT_ASSERT(" #condition ") failed!"); \
+            ZFC_LOG(Z_EMERG, __VA_ARGS__); \
+            assert(condition); \
+            /* if get this far, NDEBUG is defined, meaning assert()s do not abort */ \
+            ZFC_LOG(Z_ALERT, "assert() is disabled, so continuing despite failed assertion."); \
+        } \
+    } while(0)
 
 /**
  * \brief A macro to provide clean error checking code
  *
  * \pre Requires previous declaration of '[integral type] status' and a
- *       'cleanup' label
+ *      'cleanup' label
  * \post Status may be reassigned, function may continue or goto cleanup
  *
  * \param[IN]   bool condition: statement that evaluates to true if error is
  *                      present
- * \param[IN]   ZfErrorAction_t action: determines how to respond in
- *                      case error condition is true
  * \param[IN]   [integral type] new_status: the new status that gets assigned
  * \param[IN]   ZfLogLevel_t level: the importance level of the error
  * \param[IN]   ...: the formatted error message
  */
-#define ZF_CHECK(condition, action, new_status, level, ...) \
-    do \
-    { \
-        if (condition) { \
-            status = new_status; \
-            ZFC_LOG(level, __VA_ARGS__); \
-            switch (action) { \
-                case Z_CLEANUP: \
-                    goto cleanup; \
-                    break; \
-                default: \
-                    break; \
-            } \
-        } \
-    } while(0)
-
+#define ZF_CHECK(condition, new_status, level, ...) \
+    ZF_CHECK_EXT_GOTO(condition, cleanup, status, new_status, level, __VA_ARGS__);
 
 /**
- * \brief Instead of getting the full path, get just the filename
+ * \brief A variants of ZF_CHECK that lets you name your own 'goto' label
  */
-#define __FILENAME__ ( strrchr( __FILE__, '/' ) ? strrchr( __FILE__, '/' ) + 1 : __FILE__ )
+#define ZF_CHECKG(condition, label, new_status, level, ...) \
+    ZF_CHECK_EXT_GOTO(condition, label, status, new_status, level, __VA_ARGS__)
 
+/**
+ * \brief A variant of ZF_CHECK that does not 'goto'
+ */
+#define ZF_CHECKC(condition, new_status, level, ...) \
+    ZF_CHECK_EXT_CONT(condition, status, new_status, level, __VA_ARGS__)
+
+/**
+ * \brief Log a message
+ */
 #define ZFC_LOG(level, ...) \
     ZfcLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 
+/**
+ * \brief Cnoditionally log a message
+ */
 #define ZFC_LOG_IF(condition, level, ...) \
-    do \
-    { \
+    do { \
         if (condition) { \
             ZFC_LOG(level, __VA_ARGS__); \
         } \
@@ -95,15 +105,9 @@ typedef enum ZfLogType_e
 {
     Z_ZFLOG = 0,
     Z_STDERR,
-    Z_STDOUT,
-    Z_SYSLOG,
+    Z_STDOUT, /* same as printf() */
+    Z_SYSLOG
 } ZfLogType_t;
-
-typedef enum ZfErrorAction_e
-{
-    Z_NONE = 0,
-    Z_CLEANUP,
-} ZfErrorAction_t;
 
 
 /******************************************************************************
