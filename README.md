@@ -21,7 +21,7 @@ take away.
     - stdout
     - stderr
     - syslog
-    - z_log (wip)
+    - zf_log (wip)
 - Compiles with `-std=c99` and strict warnings enabled
 
 
@@ -48,12 +48,12 @@ where `Z_LOG()` itself encapsulates non-trivial logging functionality.
 
 # Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
-- Logging support for z_log (wip)
+- Logging support for zf_log (wip)
 - Background section in README: purpose, importance of defensive coding, good practices
 - Example of some real file, before and after
 - Improve Makefile, move to CMake
 
 
 # Name
-The `zf` in `z_check` comes from [z_log](https://github.com/wonder-mice/z_log), a nice logging
+The "z" in z_check is inspired by [zf_log](https://github.com/wonder-mice/zf_log), a nice logging
 library that z_check supports as one of its logging options.
