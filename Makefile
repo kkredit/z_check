@@ -5,12 +5,12 @@ CC=gcc
 CXX=g++
 
 SRC:= \
-	zf_check/zf_check.c \
+	z_check/z_check.c \
 	examples/example.c
 INCDIRS:= \
 	. \
-	zf_log \
-	zf_check
+	z_log \
+	z_check
 
 BUILDDIR:=build
 EXENAME:=$(BUILDDIR)/example

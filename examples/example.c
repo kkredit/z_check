@@ -1,7 +1,7 @@
 /**
  * \file example.c
  *
- * \brief Provides basic zf_check example usage.
+ * \brief Provides basic z_check example usage.
  * \details
  *
  * \copyright Copyright (c) 2019, Kevin Kredit.
@@ -11,7 +11,7 @@
 
 /******************************************************************************
  *                                                                 Inclusions */
-#include "zf_check.h"
+#include "z_check.h"
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -31,33 +31,33 @@ int main(void) {
 
     /* Open the logger.
      *
-     * zf_log supports static as well as dynamic configuration. The Open() and Close() functions
+     * z_log supports static as well as dynamic configuration. The Open() and Close() functions
      * are for dynamic (runtime) configuration. To try static configuration, remove or comment-
-     * out `ZfcLog_Open()` and `ZfcLog_cClose()`, then define `ZF_CHECK_STATIC_CONFIG` in
-     * zf_check.h. */
+     * out `ZfcLog_Open()` and `ZfcLog_cClose()`, then define `Z_CHECK_STATIC_CONFIG` in
+     * z_check.h. */
     ZfcLog_Open(Z_STDOUT, Z_INFO, "example_dynamic");
 
     /* Try out the features. */
     status = testExampleAsserts();
-    ZF_CHECK(0 != status, -1, Z_ERR, "[X] testExampleAsserts failed!");
+    Z_CHECK(0 != status, -1, Z_ERR, "[X] testExampleAsserts failed!");
 
     status = testExampleLogs();
-    ZF_CHECK(0 != status, -1, Z_ERR, "[X] testExampleLogs failed!");
+    Z_CHECK(0 != status, -1, Z_ERR, "[X] testExampleLogs failed!");
 
     status = testExampleChecks();
-    ZF_CHECK(0 != status, -1, Z_ERR, "[X] testExampleChecks failed!");
+    Z_CHECK(0 != status, -1, Z_ERR, "[X] testExampleChecks failed!");
 
     status = testExampleCheckGs();
-    ZF_CHECK(0 != status, -1, Z_ERR,
+    Z_CHECK(0 != status, -1, Z_ERR,
              "[+] testExampleCheckGs failed! (as expected) status = %d", status);
 
     /* Because testExampleCheckGs() is expected to fail and the action is set to goto cleanup,
      * this message will not print. */
-    ZFC_LOG(Z_ERR, "[X] this will not print");
+    Z_LOG(Z_ERR, "[X] this will not print");
 
     /* Use 'cleanup' tag to mark the end of the function, including actual clean up code. */
 cleanup:
-    ZFC_LOG_IF(0 != status, Z_INFO, "[+] returning");
+    Z_LOG_IF(0 != status, Z_INFO, "[+] returning");
     ZfcLog_Close();
     return status;
 }
@@ -68,21 +68,21 @@ cleanup:
 int testExampleAsserts(void) {
     int status = 0;
 
-    /* ZF_CT_ASSERT performs compile-time asserts. Naturally, you can only use it to test
+    /* Z_CT_ASSERT performs compile-time asserts. Naturally, you can only use it to test
      * information known to the compiler during the build.
      *
      * Uncomment the second statement to see it in action. */
 
-    ZF_CT_ASSERT(2 + 2 == 4);
-    //ZF_CT_ASSERT(2 + 2 == 5);
+    Z_CT_ASSERT(2 + 2 == 4);
+    //Z_CT_ASSERT(2 + 2 == 5);
 
-    /* ZF_RT_ASSERT performs run-time asserts. It is a wrapper around assert() that allows
+    /* Z_RT_ASSERT performs run-time asserts. It is a wrapper around assert() that allows
      * you to define human friendly messages while debugging.
      *
      * Uncomment the second statement to see it in action. */
 
-    ZF_RT_ASSERT(4 == 4, "2 + 2 == 4.");
-    //ZF_RT_ASSERT(2 + 2 == 5, "2 + 2 != 5. O cruel, needless misunderstanding!");
+    Z_RT_ASSERT(4 == 4, "2 + 2 == 4.");
+    //Z_RT_ASSERT(2 + 2 == 5, "2 + 2 != 5. O cruel, needless misunderstanding!");
 
     return status;
 }
@@ -92,20 +92,20 @@ int testExampleLogs(void) {
 
     /* Try out a simple message, then some conditionals. */
 
-    ZFC_LOG(Z_INFO, "[+] hello, log");
+    Z_LOG(Z_INFO, "[+] hello, log");
 
-    ZFC_LOG_IF(false, Z_INFO, "[X] this will not print");
-    ZFC_LOG_IF(true, Z_INFO, "[+] this will print");
+    Z_LOG_IF(false, Z_INFO, "[X] this will not print");
+    Z_LOG_IF(true, Z_INFO, "[+] this will print");
 
 
     /* You can change the log level during runtime, which makes avoiding noise much easier.
      * This works regardless of run-time or compile-time library configuration. */
 
-    ZFC_LOG(Z_DEBUG, "[X] will not print");
+    Z_LOG(Z_DEBUG, "[X] will not print");
     ZfcLog_LevelSet(Z_DEBUG);
-    ZFC_LOG(Z_DEBUG, "[+] will print!");
+    Z_LOG(Z_DEBUG, "[+] will print!");
     ZfcLog_LevelReset();
-    ZFC_LOG(Z_DEBUG, "[X] will not print");
+    Z_LOG(Z_DEBUG, "[X] will not print");
 
     return status;
 }
@@ -114,21 +114,21 @@ int testExampleChecks(void) {
     int status = 0;
     int rvOfSomeOperation;
 
-    /* Try out the ZF_CHECK macro.
+    /* Try out the Z_CHECK macro.
      *
      * Note that it checks if the condition is TRUE. You're checking for the error condition,
      * not asserting the non-error condition. */
 
     rvOfSomeOperation = 0;
-    ZF_CHECK(0 != rvOfSomeOperation, -1, Z_ERR, "[X] this not will occur");
+    Z_CHECK(0 != rvOfSomeOperation, -1, Z_ERR, "[X] this not will occur");
 
 
-    /* ZF_CHECKC is the same as ZF_CHECK, except it continues even if the condition is true. */
+    /* Z_CHECKC is the same as Z_CHECK, except it continues even if the condition is true. */
     rvOfSomeOperation = -1;
-    ZF_CHECKC(0 != rvOfSomeOperation, status, Z_WARN,
-              "[+] this will occur, but since ZF_CHECKC continues, processing will go on");
+    Z_CHECKC(0 != rvOfSomeOperation, status, Z_WARN,
+              "[+] this will occur, but since Z_CHECKC continues, processing will go on");
 
-    ZF_CHECK(false, -1, Z_ERR, "[X] this will not occur");
+    Z_CHECK(false, -1, Z_ERR, "[X] this will not occur");
 
 cleanup:
     return status;
@@ -137,14 +137,14 @@ cleanup:
 int testExampleCheckGs(void) {
     int status = 0;
 
-    /* Try out the ZF_CHECKG macro.
+    /* Try out the Z_CHECKG macro.
      *
-     * This is the same as ZF_CHECK, except it lets you define the 'goto' tag. */
+     * This is the same as Z_CHECK, except it lets you define the 'goto' tag. */
 
     /* e.g., malloc Thing1 */
-    ZF_CHECKG(false, err1, -1, Z_ERR, "[X] this not will occur");
+    Z_CHECKG(false, err1, -1, Z_ERR, "[X] this not will occur");
     /* e.g., malloc Thing2 */
-    ZF_CHECKG(true, err2, -2, Z_ERR, "[+] this will occur");
+    Z_CHECKG(true, err2, -2, Z_ERR, "[+] this will occur");
 
     return status;
 err2:

@@ -1,18 +1,18 @@
 /**
- * \file zf_check.h
+ * \file z_check.h
  *
  * \brief Define a set of logging and error handling macros.
  * \details
- * zf_check is a library designed to provide a minimalist error handling
+ * z_check is a library designed to provide a minimalist error handling
  * approach that enables unobtrusive yet rigorous error checking in C. It lives
- * at https://github.com/kkredit/zf_check .
+ * at https://github.com/kkredit/z_check .
  *
  * \copyright Copyright (c) 2019, Kevin Kredit.
  * \license MIT
  */
 
-#ifndef ZF_CHECK_H
-#define ZF_CHECK_H
+#ifndef Z_CHECK_H
+#define Z_CHECK_H
 
 #ifdef __cplusplus
 extern "C"
@@ -21,47 +21,47 @@ extern "C"
 
 /******************************************************************************
  *                                                                 Inclusions */
-#include "zf_check_guts.h"
+#include "z_check_guts.h"
 #include <string.h>
 #include <assert.h>
 
 
 /******************************************************************************
  *                                                              Configuration */
-#define ZF_CHECK_HAS_SYSLOG
-//#define ZF_CHECK_HAS_ZF_LOG
-#ifdef ZF_CHECK_HAS_ZF_LOG
+#define Z_CHECK_HAS_SYSLOG
+//#define Z_CHECK_HAS_ZF_LOG
+#ifdef Z_CHECK_HAS_ZF_LOG
     #error "zf_log logging option not implemented yet"
 #endif
 
-//#define ZF_CHECK_STATIC_CONFIG
-#ifdef ZF_CHECK_STATIC_CONFIG
-    #undef ZF_CHECK_HAS_SYSLOG
+//#define Z_CHECK_STATIC_CONFIG
+#ifdef Z_CHECK_STATIC_CONFIG
+    #undef Z_CHECK_HAS_SYSLOG
 
     #define Z_STDOUT    0   /* same as printf() */
     #define Z_STDERR    1
-    #ifdef ZF_CHECK_HAS_ZF_LOG
+    #ifdef Z_CHECK_HAS_Z_LOG
     #define Z_ZFLOG     2
     #endif
 
-    #define ZF_CHECK_MODULE_NAME        "module_static"
-    #define ZF_CHECK_LOG_FUNC           Z_STDOUT
-    #define ZF_CHECK_INIT_LOG_LEVEL     Z_INFO
-#endif /* ZF_CHECK_STATIC_CONFIG */
+    #define Z_CHECK_MODULE_NAME        "module_static"
+    #define Z_CHECK_LOG_FUNC           Z_STDOUT
+    #define Z_CHECK_INIT_LOG_LEVEL     Z_INFO
+#endif /* Z_CHECK_STATIC_CONFIG */
 
 
 /******************************************************************************
  *                                                                    Defines */
-#define ZF_CT_ASSERT(condition) ZF_CT_ASSERT_GUTS(condition)
+#define Z_CT_ASSERT(condition) Z_CT_ASSERT_GUTS(condition)
 
-#define ZF_RT_ASSERT(condition, ...) \
+#define Z_RT_ASSERT(condition, ...) \
     do { \
         if (!(condition)) { \
-            ZFC_LOG(Z_EMERG, "ZF_RT_ASSERT(" #condition ") failed!"); \
-            ZFC_LOG(Z_EMERG, __VA_ARGS__); \
+            Z_LOG(Z_EMERG, "Z_RT_ASSERT(" #condition ") failed!"); \
+            Z_LOG(Z_EMERG, __VA_ARGS__); \
             assert(condition); \
             /* if get this far, NDEBUG is defined, meaning assert()s do not abort */ \
-            ZFC_LOG(Z_ALERT, "assert() is disabled, so continuing despite failed assertion."); \
+            Z_LOG(Z_ALERT, "assert() is disabled, so continuing despite failed assertion."); \
         } \
     } while(0)
 
@@ -78,34 +78,34 @@ extern "C"
  * \param[IN]   ZfLogLevel_t level: the importance level of the error
  * \param[IN]   ...: the formatted error message
  */
-#define ZF_CHECK(condition, new_status, level, ...) \
-    ZF_CHECK_EXT_GOTO(condition, cleanup, status, new_status, level, __VA_ARGS__);
+#define Z_CHECK(condition, new_status, level, ...) \
+    Z_CHECK_EXT_GOTO(condition, cleanup, status, new_status, level, __VA_ARGS__);
 
 /**
- * \brief A variants of ZF_CHECK that lets you name your own 'goto' label
+ * \brief A variants of Z_CHECK that lets you name your own 'goto' label
  */
-#define ZF_CHECKG(condition, label, new_status, level, ...) \
-    ZF_CHECK_EXT_GOTO(condition, label, status, new_status, level, __VA_ARGS__)
+#define Z_CHECKG(condition, label, new_status, level, ...) \
+    Z_CHECK_EXT_GOTO(condition, label, status, new_status, level, __VA_ARGS__)
 
 /**
- * \brief A variant of ZF_CHECK that does not 'goto'
+ * \brief A variant of Z_CHECK that does not 'goto'
  */
-#define ZF_CHECKC(condition, new_status, level, ...) \
-    ZF_CHECK_EXT_CONT(condition, status, new_status, level, __VA_ARGS__)
+#define Z_CHECKC(condition, new_status, level, ...) \
+    Z_CHECK_EXT_CONT(condition, status, new_status, level, __VA_ARGS__)
 
 /**
  * \brief Log a message
  */
-#define ZFC_LOG(level, ...) \
+#define Z_LOG(level, ...) \
     ZfcLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 
 /**
  * \brief Conditionally log a message
  */
-#define ZFC_LOG_IF(condition, level, ...) \
+#define Z_LOG_IF(condition, level, ...) \
     do { \
         if (condition) { \
-            ZFC_LOG(level, __VA_ARGS__); \
+            Z_LOG(level, __VA_ARGS__); \
         } \
     } while(0)
 
@@ -126,15 +126,15 @@ typedef enum ZfLogLevel_e
     Z_DEBUG       /* debug-level messages */
 } ZfLogLevel_t;
 
-#ifndef ZF_CHECK_STATIC_CONFIG
+#ifndef Z_CHECK_STATIC_CONFIG
 typedef enum ZfLogType_e
 {
     Z_STDOUT = 0, /* same as printf() */
     Z_STDERR,
-#ifdef ZF_CHECK_HAS_ZF_LOG
+#ifdef Z_CHECK_HAS_Z_LOG
     Z_ZFLOG,
 #endif
-#ifdef ZF_CHECK_HAS_SYSLOG
+#ifdef Z_CHECK_HAS_SYSLOG
     Z_SYSLOG,
 #endif
 } ZfLogType_t;
@@ -144,7 +144,7 @@ typedef enum ZfLogType_e
 /******************************************************************************
  *                                                      Function declarations */
 
-#ifndef ZF_CHECK_STATIC_CONFIG
+#ifndef Z_CHECK_STATIC_CONFIG
 /**
  * \brief Opens and initializes the logger
  *
@@ -163,7 +163,7 @@ void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleN
  * \post Logging is no longer available
  */
 void ZfcLog_Close(void);
-#endif /* ZF_CHECK_STATIC_CONFIG */
+#endif /* Z_CHECK_STATIC_CONFIG */
 
 /**
  * \brief Set the log level
