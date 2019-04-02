@@ -6,9 +6,8 @@ tries to lessen the pain.
 The goal of this library is to be as small and generally applicable as possible.
 
 >Perfection is achieved not when there is nothing more to add, but when there is nothing left to
-take away.
-
-\- Antoine de Saint-Exupery
+>take away.  
+>\- Antoine de Saint-Exupery
 
 
 ## Features
