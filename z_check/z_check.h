@@ -66,6 +66,22 @@ extern "C"
     } while(0)
 
 /**
+ * \brief Log a message
+ */
+#define Z_LOG(level, ...) \
+    ZfcLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+
+/**
+ * \brief Conditionally log a message
+ */
+#define Z_LOG_IF(condition, level, ...) \
+    do { \
+        if (condition) { \
+            Z_LOG(level, __VA_ARGS__); \
+        } \
+    } while(0)
+
+/**
  * \brief A macro to provide clean error checking code
  *
  * \pre Requires previous declaration of '[integral type] status' and a
@@ -94,21 +110,39 @@ extern "C"
     Z_CHECK_EXT_CONT(condition, status, new_status, level, __VA_ARGS__)
 
 /**
- * \brief Log a message
+ * \brief Prevent warnings when compiling with -Wunused-label
+ *
+ * Usage:
+ *  some-unused-label:
+ *      LABEL_UNUSED;
  */
-#define Z_LOG(level, ...) \
-    ZfcLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LABEL_UNUSED __attribute__((unused))
 
 /**
- * \brief Conditionally log a message
+ * \brief Debug versions of each macro 
+ *
+ * Use same compilation flag as assert(): `NDEBUG`
  */
-#define Z_LOG_IF(condition, level, ...) \
-    do { \
-        if (condition) { \
-            Z_LOG(level, __VA_ARGS__); \
-        } \
-    } while(0)
-
+#ifdef NDEBUG
+static inline void _macro_unused(const int dummy, ...) {(void)dummy;}
+//#define _macro_unused(dummy, ...) {(void)dummy;}
+#define Z_DCT_ASSERT(...)   _macro_unused(__VA_ARGS__)
+#define Z_DRT_ASSERT(...)   _macro_unused(__VA_ARGS__)
+#define Z_DLOG(...)         _macro_unused(__VA_ARGS__)
+#define Z_DLOG_IF(...)      _macro_unused(__VA_ARGS__)
+#define Z_DCHECK(...)       _macro_unused(__VA_ARGS__)
+/* Z_DCHECKG: must explicitly exclude the unused goto label */
+#define Z_DCHECKG(condition, label, ...) _macro_unused(condition, __VA_ARGS__)
+#define Z_DCHECKC(...)      _macro_unused(__VA_ARGS__)
+#else
+#define Z_DCT_ASSERT    Z_CT_ASSERT
+#define Z_DRT_ASSERT    Z_RT_ASSERT
+#define Z_DCHECK        Z_CHECK
+#define Z_DCHECKG       Z_CHECKG
+#define Z_DCHECKC       Z_CHECKC
+#define Z_DLOG          Z_LOG
+#define Z_DLOG_IF       Z_LOG_IF
+#endif
 
 /******************************************************************************
  *                                                                      Types */

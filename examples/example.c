@@ -75,14 +75,16 @@ int testExampleAsserts(void) {
 
     Z_CT_ASSERT(2 + 2 == 4);
     //Z_CT_ASSERT(2 + 2 == 5);
+    Z_DCT_ASSERT(2 + 2 == 4);
 
     /* Z_RT_ASSERT performs run-time asserts. It is a wrapper around assert() that allows
      * you to define human friendly messages while debugging.
      *
      * Uncomment the second statement to see it in action. */
 
-    Z_RT_ASSERT(4 == 4, "2 + 2 == 4.");
+    Z_RT_ASSERT(2 + 2 == 4, "2 + 2 == 4.");
     //Z_RT_ASSERT(2 + 2 == 5, "2 + 2 != 5. O cruel, needless misunderstanding!");
+    Z_DRT_ASSERT(2 + 2 == 4, "2 + 2 == 4.");
 
     return status;
 }
@@ -93,9 +95,11 @@ int testExampleLogs(void) {
     /* Try out a simple message, then some conditionals. */
 
     Z_LOG(Z_INFO, "[+] hello, log");
+    Z_DLOG(Z_INFO, "[+] hello, debug log! (this is unrelated to Z_DEBUG and log levels)");
 
     Z_LOG_IF(false, Z_INFO, "[X] this will not print");
     Z_LOG_IF(true, Z_INFO, "[+] this will print");
+    Z_DLOG_IF(true, Z_INFO, "[+] this will print when NDEBUG is not defined");
 
 
     /* You can change the log level during runtime, which makes avoiding noise much easier.
@@ -130,6 +134,10 @@ int testExampleChecks(void) {
 
     Z_CHECK(false, -1, Z_ERR, "[X] this will not occur");
 
+    /* These will be tested when NDEBUG is not defined. */
+    Z_DCHECK(false, -1, Z_ERR, "[X] this not will occur");
+    Z_DCHECKC(true, 0, Z_ERR, "[+] this will occur when NDEBUG is not defined, but is not fatal");
+
 cleanup:
     return status;
 }
@@ -144,10 +152,18 @@ int testExampleCheckGs(void) {
     /* e.g., malloc Thing1 */
     Z_CHECKG(false, err1, -1, Z_ERR, "[X] this not will occur");
     /* e.g., malloc Thing2 */
-    Z_CHECKG(true, err2, -2, Z_ERR, "[+] this will occur");
+    Z_DCHECKG(false, err2, -1, Z_ERR, "[X] this will not occur");
+    /* e.g., malloc Thing3 */
+    Z_CHECKG(true, err3, -2, Z_ERR, "[+] this will occur");
 
     return status;
+err3:
+    /* err3 specific cleanup steps, e.g. free Thing3 */
 err2:
+    /* Since this label is referenced only when NDEBUG is not defined, when compiling with
+     * -Wunused-label, LABEL_UNUSED is needed to prevent a compiler warning. */
+    LABEL_UNUSED;
+
     /* err2 specific cleanup steps, e.g. free Thing2 */
 err1:
     /* err1 specific cleanup steps, e.g. free Thing1 */
