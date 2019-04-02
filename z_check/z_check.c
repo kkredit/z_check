@@ -28,7 +28,7 @@
  *                                                                    Defines */
 #define DEFAULT_MODULE_NAME "Unnamed Module"
 #define MESSAGE_MAX_LEN 512
-#define ZFL_STR(level) \
+#define ZL_STR(level) \
     (Z_EMERG  == (level) ? "EMERGENCY" : \
      (Z_ALERT  == (level) ? "ALERT" : \
       (Z_CRIT   == (level) ? "CRITICAL" : \
@@ -37,16 +37,16 @@
          (Z_NOTICE == (level) ? "NOTICE" : \
           (Z_INFO   == (level) ? "INFO" : \
            (Z_DEBUG  == (level) ? "DEBUG" : "UNKNOWN_LEVEL"))))))))
-#define ZFL2SYSLOG_LEVEL(level) ((int)level)
-#define ZFL2ZFLOG_LEVEL(level) \
-    (Z_EMERG  == (level) ? Z_LOG_FATAL : \
-     (Z_ALERT  == (level) ? Z_LOG_FATAL : \
-      (Z_CRIT   == (level) ? Z_LOG_ERROR : \
-       (Z_ERR    == (level) ? Z_LOG_ERROR : \
-        (Z_WARN   == (level) ? Z_LOG_WARN : \
-         (Z_NOTICE == (level) ? Z_LOG_INFO : \
-          (Z_INFO   == (level) ? Z_LOG_DEBUG : \
-           (Z_DEBUG  == (level) ? Z_LOG_VERBOSE : Z_LOG_NONE))))))))
+#define ZL2SYSLOG_LEVEL(level) ((int)level)
+#define ZL2ZFLOG_LEVEL(level) \
+    (Z_EMERG  == (level) ? ZF_LOG_FATAL : \
+     (Z_ALERT  == (level) ? ZF_LOG_FATAL : \
+      (Z_CRIT   == (level) ? ZF_LOG_ERROR : \
+       (Z_ERR    == (level) ? ZF_LOG_ERROR : \
+        (Z_WARN   == (level) ? ZF_LOG_WARN : \
+         (Z_NOTICE == (level) ? ZF_LOG_INFO : \
+          (Z_INFO   == (level) ? ZF_LOG_DEBUG : \
+           (Z_DEBUG  == (level) ? ZF_LOG_VERBOSE : ZF_LOG_NONE))))))))
 
 
 /******************************************************************************
@@ -202,11 +202,11 @@ void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
 
 
 /******************************************************************************
- *                                                      Function declarations */
+ *                                                         Internal functions */
 static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char *file, int line,
                                   const char *func) {
     fprintf(outfile, "%s: [%s] %s:%d:%s: %s\n",
-            m_moduleName, ZFL_STR(level), file, line, func, m_message);
+            m_moduleName, ZL_STR(level), file, line, func, m_message);
 }
 
 static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) {
@@ -219,13 +219,13 @@ static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const 
 
 #ifdef Z_CHECK_HAS_Z_LOG
 static void ZfcLog_ZfLog(ZfLogLevel_t level, const char *file, int line, const char *func) {
-    Z_LOG_WRITE(ZFL2ZFLOG_LEVEL(level), "", "%s:%d:%s: %s", file, line, func, m_message);
+    ZF_LOG_WRITE(ZL2ZFLOG_LEVEL(level), "", "%s:%d:%s: %s", file, line, func, m_message);
 }
 #endif
 
 #ifdef Z_CHECK_HAS_SYSLOG
 static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) {
-    syslog(ZFL2SYSLOG_LEVEL(level), "[%s] %s:%d:%s: %s", ZFL_STR(level), file, line, func, m_message);
+    syslog(ZL2SYSLOG_LEVEL(level), "[%s] %s:%d:%s: %s", ZL_STR(level), file, line, func, m_message);
 }
 #endif
 
