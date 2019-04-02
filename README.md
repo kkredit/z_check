@@ -48,6 +48,7 @@ where `Z_LOG()` itself encapsulates non-trivial logging functionality.
 
 # Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
+- `Z_D____` variants that compile out in production
 - Logging support for zf_log (wip)
 - Background section in README: purpose, importance of defensive coding, good practices
 - Example of some real file, before and after
