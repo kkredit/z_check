@@ -53,6 +53,7 @@ where `Z_LOG()` itself encapsulates non-trivial logging functionality.
 - Background section in README: purpose, importance of defensive coding, good practices
 - Example of some real file, before and after
 - Improve Makefile, move to CMake
+- Refactor/cleanup/consolidate after adding new functionality
 
 
 ## Name
