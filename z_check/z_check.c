@@ -51,7 +51,7 @@
 
 /******************************************************************************
  *                                                                      Types */
-typedef void (*ZfcLogFn_t)(ZfLogLevel_t level, const char *file, int line, const char *func);
+typedef void (*ZLogFn_t)(ZLogLevel_t level, const char *file, int line, const char *func);
 
 
 /******************************************************************************
@@ -60,9 +60,9 @@ typedef void (*ZfcLogFn_t)(ZfLogLevel_t level, const char *file, int line, const
 
 /* Dynamically configured */
 static const char *m_moduleName = NULL;
-static ZfcLogFn_t m_zfcLogFunc = NULL;
-static ZfLogLevel_t m_logLevel;
-static ZfLogLevel_t m_logLevelOrig;
+static ZLogFn_t m_ZLogFunc = NULL;
+static ZLogLevel_t m_logLevel;
+static ZLogLevel_t m_logLevelOrig;
 
 #define FUNC_USED
 
@@ -80,16 +80,16 @@ static ZfLogLevel_t m_logLevelOrig;
 
 static const char *m_moduleName = Z_CHECK_MODULE_NAME;
 #if Z_CHECK_LOG_FUNC == Z_STDOUT
-    #define m_zfcLogFunc ZfcLog_StdOut
+    #define m_ZLogFunc ZLog_StdOut
 #elif Z_CHECK_LOG_FUNC == Z_STDERR
-    #define m_zfcLogFunc ZfcLog_StdErr
+    #define m_ZLogFunc ZLog_StdErr
 #elif Z_CHECK_LOG_FUNC == Z_ZFLOG
-    #define m_zfcLogFunc ZfcLog_ZfLog
+    #define m_ZLogFunc ZLog_ZfLog
 #else
     #error "invalid Z_CHECK_LOG_FUNC"
 #endif
-static ZfLogLevel_t m_logLevel = Z_CHECK_INIT_LOG_LEVEL;
-static ZfLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
+static ZLogLevel_t m_logLevel = Z_CHECK_INIT_LOG_LEVEL;
+static ZLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
 
 #endif /* Z_CHECK_STATIC_CONFIG */
 
@@ -98,24 +98,24 @@ static char m_message[MESSAGE_MAX_LEN] = { 0 };
 
 /******************************************************************************
  *                                                      Function declarations */
-static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char *file, int line,
-                                  const char *func);
-static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
-static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
-#ifdef Z_CHECK_HAS_Z_LOG
-static void ZfcLog_ZfLog(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+static inline void ZLog_StdFile(FILE *outfile, ZLogLevel_t level, const char *file, int line,
+                                const char *func);
+static void ZLog_StdErr(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+static void ZLog_StdOut(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+#ifdef Z_CHECK_HAS_ZF_LOG
+static void ZLog_ZfLog(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 #endif
 #ifdef Z_CHECK_HAS_SYSLOG
-static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+static void ZLog_Syslog(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 #endif
 
 
 /******************************************************************************
  *                                                         External functions */
 #ifndef Z_CHECK_STATIC_CONFIG
-void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleName) {
-    if (NULL != m_zfcLogFunc) {
-        Z_LOG(Z_WARN, "called ZfcLog_Open() twice in same module, %s", m_moduleName);
+void ZLog_Open(ZLogType_t logType, ZLogLevel_t logLevel, const char *moduleName) {
+    if (NULL != m_ZLogFunc) {
+        Z_LOG(Z_WARN, "called ZLog_Open() twice in same module, %s", m_moduleName);
     }
     else {
         m_moduleName = (NULL != moduleName) ? moduleName : DEFAULT_MODULE_NAME;
@@ -124,23 +124,23 @@ void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleN
 
         switch (logType) {
             case Z_STDERR:
-                m_zfcLogFunc = ZfcLog_StdErr;
+                m_ZLogFunc = ZLog_StdErr;
                 break;
 
             case Z_STDOUT:
-                m_zfcLogFunc = ZfcLog_StdOut;
+                m_ZLogFunc = ZLog_StdOut;
                 break;
 
 #ifdef Z_CHECK_HAS_Z_LOG
             case Z_ZFLOG:
-                m_zfcLogFunc = ZfcLog_ZfLog;
+                m_ZLogFunc = ZLog_ZfLog;
                 break;
 #endif
 
 #ifdef Z_CHECK_HAS_SYSLOG
             case Z_SYSLOG:
                 openlog(m_moduleName, LOG_CONS, LOG_LOCAL0);
-                m_zfcLogFunc = ZfcLog_Syslog;
+                m_ZLogFunc = ZLog_Syslog;
                 break;
 #endif
 
@@ -148,38 +148,38 @@ void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleN
                 /* don't have Z_LOG setup yet to use */
                 fprintf(stderr, "Warning: Unknown log type (%d); falling back to stderr\n",
                         (int)logType);
-                m_zfcLogFunc = ZfcLog_StdErr;
+                m_ZLogFunc = ZLog_StdErr;
                 break;
         }
     }
 }
 
-void ZfcLog_Close(void) {
+void ZLog_Close(void) {
 #ifdef Z_CHECK_HAS_SYSLOG
-    if (ZfcLog_Syslog == m_zfcLogFunc) {
+    if (ZLog_Syslog == m_ZLogFunc) {
         closelog();
     }
 #endif
 
-    m_zfcLogFunc = NULL;
+    m_ZLogFunc = NULL;
     m_moduleName = NULL;
     memset(m_message, 0, sizeof(m_message));
 }
 #endif /* Z_CHECK_STATIC_CONFIG */
 
-void ZfcLog_LevelSet(ZfLogLevel_t logLevel) {
+void ZLog_LevelSet(ZLogLevel_t logLevel) {
     m_logLevel = logLevel;
 }
 
-void ZfcLog_LevelReset(void) {
+void ZLog_LevelReset(void) {
     m_logLevel = m_logLevelOrig;
 }
 
-void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
-            const char *format, ...) {
+void ZLog(ZLogLevel_t level, const char *file, int line, const char *func,
+          const char *format, ...) {
 #ifndef Z_CHECK_STATIC_CONFIG
-    if (NULL == m_zfcLogFunc) {
-        fprintf(stderr, "Error: May not use ZfcLog() before calling ZfcLog_Open()\n");
+    if (NULL == m_ZLogFunc) {
+        fprintf(stderr, "Error: May not use ZLog() before calling ZLog_Open()\n");
     }
     else
 #endif /* Z_CHECK_STATIC_CONFIG */
@@ -195,7 +195,7 @@ void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
         }
 
         if (0 < rc) {
-            m_zfcLogFunc(level, file, line, func);
+            m_ZLogFunc(level, file, line, func);
         }
     }
 }
@@ -203,28 +203,28 @@ void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
 
 /******************************************************************************
  *                                                         Internal functions */
-static inline void ZfcLog_StdFile(FILE *outfile, ZfLogLevel_t level, const char *file, int line,
-                                  const char *func) {
+static inline void ZLog_StdFile(FILE *outfile, ZLogLevel_t level, const char *file, int line,
+                                const char *func) {
     fprintf(outfile, "%s: [%s] %s:%d:%s: %s\n",
             m_moduleName, ZL_STR(level), file, line, func, m_message);
 }
 
-static void ZfcLog_StdOut(ZfLogLevel_t level, const char *file, int line, const char *func) {
-    ZfcLog_StdFile(stdout, level, file, line, func);
+static void ZLog_StdOut(ZLogLevel_t level, const char *file, int line, const char *func) {
+    ZLog_StdFile(stdout, level, file, line, func);
 }
 
-static void ZfcLog_StdErr(ZfLogLevel_t level, const char *file, int line, const char *func) {
-    ZfcLog_StdFile(stderr, level, file, line, func);
+static void ZLog_StdErr(ZLogLevel_t level, const char *file, int line, const char *func) {
+    ZLog_StdFile(stderr, level, file, line, func);
 }
 
-#ifdef Z_CHECK_HAS_Z_LOG
-static void ZfcLog_ZfLog(ZfLogLevel_t level, const char *file, int line, const char *func) {
+#ifdef Z_CHECK_HAS_ZF_LOG
+static void ZLog_ZfLog(ZLogLevel_t level, const char *file, int line, const char *func) {
     ZF_LOG_WRITE(ZL2ZFLOG_LEVEL(level), "", "%s:%d:%s: %s", file, line, func, m_message);
 }
 #endif
 
 #ifdef Z_CHECK_HAS_SYSLOG
-static void ZfcLog_Syslog(ZfLogLevel_t level, const char *file, int line, const char *func) {
+static void ZLog_Syslog(ZLogLevel_t level, const char *file, int line, const char *func) {
     syslog(ZL2SYSLOG_LEVEL(level), "[%s] %s:%d:%s: %s", ZL_STR(level), file, line, func, m_message);
 }
 #endif

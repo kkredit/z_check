@@ -61,7 +61,7 @@ extern "C"
  *                      present
  * \param[IN]   [integral type] setvar: the variable that gets assigned
  * \param[IN]   [integral type] newval: the value that gets assigned
- * \param[IN]   ZfLogLevel_t level: the importance level of the error
+ * \param[IN]   ZLogLevel_t level: the importance level of the error
  * \param[IN]   ...: the formatted error message
  */
 #define Z_CHECK_EXT_GOTO(condition, label, setvar, newval, level, ...) \
@@ -81,7 +81,7 @@ extern "C"
  *                      present
  * \param[IN]   [integral type] setvar: the variable that gets assigned
  * \param[IN]   [integral type] newval: the value that gets assigned
- * \param[IN]   ZfLogLevel_t level: the importance level of the error
+ * \param[IN]   ZLogLevel_t level: the importance level of the error
  * \param[IN]   ...: the formatted error message
  */
 #define Z_CHECK_EXT_CONT(condition, setvar, newval, level, ...) \

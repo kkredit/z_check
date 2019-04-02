@@ -69,7 +69,7 @@ extern "C"
  * \brief Log a message
  */
 #define Z_LOG(level, ...) \
-    ZfcLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+    ZLog(level, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 
 /**
  * \brief Conditionally log a message
@@ -91,7 +91,7 @@ extern "C"
  * \param[IN]   bool condition: statement that evaluates to true if error is
  *                      present
  * \param[IN]   [integral type] new_status: the new status that gets assigned
- * \param[IN]   ZfLogLevel_t level: the importance level of the error
+ * \param[IN]   ZLogLevel_t level: the importance level of the error
  * \param[IN]   ...: the formatted error message
  */
 #define Z_CHECK(condition, new_status, level, ...) \
@@ -148,7 +148,7 @@ static inline void _macro_unused(const int dummy, ...) {(void)dummy;}
  *                                                                      Types */
 
 /* Levels modeled after syslog */
-typedef enum ZfLogLevel_e
+typedef enum ZLogLevel_e
 {
     Z_EMERG = 0,  /* system is unusable */
     Z_ALERT,      /* action must be taken immediately */
@@ -158,10 +158,10 @@ typedef enum ZfLogLevel_e
     Z_NOTICE,     /* normal but significant condition */
     Z_INFO,       /* informational */
     Z_DEBUG       /* debug-level messages */
-} ZfLogLevel_t;
+} ZLogLevel_t;
 
 #ifndef Z_CHECK_STATIC_CONFIG
-typedef enum ZfLogType_e
+typedef enum ZLogType_e
 {
     Z_STDOUT = 0, /* same as printf() */
     Z_STDERR,
@@ -171,7 +171,7 @@ typedef enum ZfLogType_e
 #ifdef Z_CHECK_HAS_SYSLOG
     Z_SYSLOG,
 #endif
-} ZfLogType_t;
+} ZLogType_t;
 #endif
 
 
@@ -184,46 +184,46 @@ typedef enum ZfLogType_e
  *
  * \post Logging is available
  *
- * \param[IN]   ZfLogType_t logType: Desired log type
- * \param[IN]   ZfLogLevel_t logLevel: Desired log level (inclusive)
+ * \param[IN]   ZLogType_t logType: Desired log type
+ * \param[IN]   ZLogLevel_t logLevel: Desired log level (inclusive)
  * \param[IN]   const char * moduleName: Name of module
  */
-void ZfcLog_Open(ZfLogType_t logType, ZfLogLevel_t logLevel, const char *moduleName);
+void ZLog_Open(ZLogType_t logType, ZLogLevel_t logLevel, const char *moduleName);
 
 /**
  * \brief Closes and deconstructs the logger
  *
- * \pre Open logger with ZfcLog_Open
+ * \pre Open logger with ZLog_Open
  * \post Logging is no longer available
  */
-void ZfcLog_Close(void);
+void ZLog_Close(void);
 #endif /* Z_CHECK_STATIC_CONFIG */
 
 /**
  * \brief Set the log level
  *
- * \param[IN]   ZfLogLevel_t logLevel: Desired log level (inclusive)
+ * \param[IN]   ZLogLevel_t logLevel: Desired log level (inclusive)
  */
-void ZfcLog_LevelSet(ZfLogLevel_t logLevel);
+void ZLog_LevelSet(ZLogLevel_t logLevel);
 
 /**
  * \brief Reset the log level to the original value
  */
-void ZfcLog_LevelReset(void);
+void ZLog_LevelReset(void);
 
 /**
  * \brief Write to the log
  *
- * \pre Logger must be intialized with ZfcLog_Open
+ * \pre Logger must be intialized with ZLog_Open
  *
- * \param[IN]   ZfLogLevel_t level: Error level of message
+ * \param[IN]   ZLogLevel_t level: Error level of message
  * \param[IN]   const char * file: File where log is called
  * \param[IN]   int line: Line where log is called
  * \param[IN]   const char * func: Function where log is called
  * \param[IN]   const char * format: Error message
  */
-void ZfcLog(ZfLogLevel_t level, const char *file, int line, const char *func,
-            const char *format, ...) __attribute__((format(printf, 5, 6)));
+void ZLog(ZLogLevel_t level, const char *file, int line, const char *func,
+          const char *format, ...) __attribute__((format(printf, 5, 6)));
 
 
 /******************************************************************************

@@ -33,9 +33,9 @@ int main(void) {
      *
      * z_log supports static as well as dynamic configuration. The Open() and Close() functions
      * are for dynamic (runtime) configuration. To try static configuration, remove or comment-
-     * out `ZfcLog_Open()` and `ZfcLog_cClose()`, then define `Z_CHECK_STATIC_CONFIG` in
+     * out `ZLog_Open()` and `ZLog_cClose()`, then define `Z_CHECK_STATIC_CONFIG` in
      * z_check.h. */
-    ZfcLog_Open(Z_STDOUT, Z_INFO, "example_dynamic");
+    ZLog_Open(Z_STDOUT, Z_INFO, "example_dynamic");
 
     /* Try out the features. */
     status = testExampleAsserts();
@@ -58,7 +58,7 @@ int main(void) {
     /* Use 'cleanup' tag to mark the end of the function, including actual clean up code. */
 cleanup:
     Z_LOG_IF(0 != status, Z_INFO, "[+] returning");
-    ZfcLog_Close();
+    ZLog_Close();
     return status;
 }
 
@@ -106,9 +106,9 @@ int testExampleLogs(void) {
      * This works regardless of run-time or compile-time library configuration. */
 
     Z_LOG(Z_DEBUG, "[X] will not print");
-    ZfcLog_LevelSet(Z_DEBUG);
+    ZLog_LevelSet(Z_DEBUG);
     Z_LOG(Z_DEBUG, "[+] will print!");
-    ZfcLog_LevelReset();
+    ZLog_LevelReset();
     Z_LOG(Z_DEBUG, "[X] will not print");
 
     return status;
