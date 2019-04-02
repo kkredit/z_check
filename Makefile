@@ -9,8 +9,8 @@ SRC:= \
 	examples/example.c
 INCDIRS:= \
 	. \
-	z_log \
-	z_check
+	z_check \
+	z_check/zf_log
 
 BUILDDIR:=build
 EXENAME:=$(BUILDDIR)/example

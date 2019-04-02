@@ -17,7 +17,7 @@
 #include <stdarg.h>
 #ifdef Z_CHECK_HAS_Z_LOG
 #define Z_LOG_DEF_LEVEL Z_LOG_VERBOSE
-#include "z_log/z_log.h"
+#include "zf_log/zf_log.h"
 #endif
 #ifdef Z_CHECK_HAS_SYSLOG
 #include <syslog.h>
