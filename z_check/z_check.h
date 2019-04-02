@@ -33,10 +33,12 @@ extern "C"
 #ifdef Z_CHECK_HAS_ZF_LOG
     #error "zf_log logging option not implemented yet"
 #endif
+//#define Z_CHECK_HAS_XENTOOLLOG
 
 //#define Z_CHECK_STATIC_CONFIG
 #ifdef Z_CHECK_STATIC_CONFIG
     #undef Z_CHECK_HAS_SYSLOG
+    #undef Z_CHECK_HAS_XENTOOLLOG
 
     #define Z_STDOUT    0   /* same as printf() */
     #define Z_STDERR    1
@@ -170,6 +172,9 @@ typedef enum ZLogType_e
 #endif
 #ifdef Z_CHECK_HAS_SYSLOG
     Z_SYSLOG,
+#endif
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+    Z_XENTOOLLOG,
 #endif
 } ZLogType_t;
 #endif

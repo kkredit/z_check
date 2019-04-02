@@ -22,6 +22,9 @@
 #ifdef Z_CHECK_HAS_SYSLOG
 #include <syslog.h>
 #endif
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+#include <xentoollog.h>
+#endif
 
 
 /******************************************************************************
@@ -47,6 +50,15 @@
          (Z_NOTICE == (level) ? ZF_LOG_INFO : \
           (Z_INFO   == (level) ? ZF_LOG_DEBUG : \
            (Z_DEBUG  == (level) ? ZF_LOG_VERBOSE : ZF_LOG_NONE))))))))
+#define ZL2XTL_LEVEL(level) \
+    (Z_EMERG  == (level) ? XTL_CRITICAL : \
+     (Z_ALERT  == (level) ? XTL_CRITICAL : \
+      (Z_CRIT   == (level) ? XTL_CRITICAL : \
+       (Z_ERR    == (level) ? XTL_ERROR : \
+        (Z_WARN   == (level) ? XTL_WARN : \
+         (Z_NOTICE == (level) ? XTL_NOTICE : \
+          (Z_INFO   == (level) ? XTL_INFO : \
+           (Z_DEBUG  == (level) ? XTL_DEBUG : XTL_NOTICE))))))))
 
 
 /******************************************************************************
@@ -75,6 +87,9 @@ static ZLogLevel_t m_logLevelOrig;
 #if defined(Z_CHECK_HAS_SYSLOG)
     #error "Syslog version of Z_CHECK requires dynamic configuration"
 #endif
+#if defined(Z_CHECK_HAS_XENTOOLLOG)
+    #error "Xentoollog version of Z_CHECK requires dynamic configuration"
+#endif
 
 #define FUNC_USED  __attribute__((unused))
 
@@ -94,6 +109,9 @@ static ZLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
 #endif /* Z_CHECK_STATIC_CONFIG */
 
 static char m_message[MESSAGE_MAX_LEN] = { 0 };
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+static xentoollog_logger *m_xentoolLogger = NULL;
+#endif
 
 
 /******************************************************************************
@@ -107,6 +125,10 @@ static void ZLog_ZfLog(ZLogLevel_t level, const char *file, int line, const char
 #endif
 #ifdef Z_CHECK_HAS_SYSLOG
 static void ZLog_Syslog(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+#endif
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+static void ZLog_Xentoollog(ZLogLevel_t level, const char *file, int line,
+                            const char *func) FUNC_USED;
 #endif
 
 
@@ -144,6 +166,27 @@ void ZLog_Open(ZLogType_t logType, ZLogLevel_t logLevel, const char *moduleName)
                 break;
 #endif
 
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+            case Z_XENTOOLLOG:
+                m_xentoolLogger = (xentoollog_logger *)
+                                  xtl_createlogger_stdiostream(stderr, XTL_DEBUG, 0);
+
+                if (NULL == m_xentoolLogger)
+                {
+                    fprintf(stderr, "xtl_createlogger_stdiostream() failed; "
+                            "errno = %d; falling back to stderr\n", errno);
+                    m_ZLogFunc = ZLog_StdErr;
+                }
+                else
+                {
+                    xtl_stdiostream_set_minlevel((xentoollog_logger_stdiostream *)m_xentoolLogger,
+                                                 XTL_DEBUG);
+                    m_ZLogFunc = ZLog_Xentoollog;
+                }
+
+                break;
+#endif
+
             default:
                 /* don't have Z_LOG setup yet to use */
                 fprintf(stderr, "Warning: Unknown log type (%d); falling back to stderr\n",
@@ -158,6 +201,13 @@ void ZLog_Close(void) {
 #ifdef Z_CHECK_HAS_SYSLOG
     if (ZLog_Syslog == m_ZLogFunc) {
         closelog();
+    }
+#endif
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+    if (ZLog_Xentoollog == m_ZLogFunc)
+    {
+        xtl_logger_destroy(m_xentoolLogger);
+        m_xentoolLogger = NULL;
     }
 #endif
 
@@ -226,6 +276,13 @@ static void ZLog_ZfLog(ZLogLevel_t level, const char *file, int line, const char
 #ifdef Z_CHECK_HAS_SYSLOG
 static void ZLog_Syslog(ZLogLevel_t level, const char *file, int line, const char *func) {
     syslog(ZL2SYSLOG_LEVEL(level), "[%s] %s:%d:%s: %s", ZL_STR(level), file, line, func, m_message);
+}
+#endif
+
+#ifdef Z_CHECK_HAS_XENTOOLLOG
+static void ZLog_Xentoollog(ZLogLevel_t level, const char *file, int line, const char *func) {
+    xtl_log(m_xentoolLogger, ZL2XTL_LEVEL(level), m_moduleName,
+            "%s:%d:%s: %s", file, line, func, m_message);
 }
 #endif
 
