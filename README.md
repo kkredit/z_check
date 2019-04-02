@@ -11,7 +11,7 @@ take away.
 \- Antoine de Saint-Exupery
 
 
-# Features
+## Features
 - Run-time and build-time library configuration
 - Run-time modification of logging levels (helps with noise)
 - `Z_CT_ASSERT`: simple compile-time asserts
@@ -25,7 +25,7 @@ take away.
 - Compiles with `-std=c99` and strict warnings enabled
 
 
-# Example
+## Example
 See [example.c](examples/example.c), which exercises most of the library's
 functionality.
 
@@ -46,7 +46,7 @@ is equivalent to:
 where `Z_LOG()` itself encapsulates non-trivial logging functionality.
 
 
-# Wishlist
+## Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
 - `Z_D____` variants that compile out in production
 - Logging support for zf_log (wip)
@@ -55,6 +55,6 @@ where `Z_LOG()` itself encapsulates non-trivial logging functionality.
 - Improve Makefile, move to CMake
 
 
-# Name
+## Name
 The "z" in z_check is inspired by [zf_log](https://github.com/wonder-mice/zf_log), a nice logging
 library that z_check supports as one of its logging options.
