@@ -49,9 +49,13 @@ where `Z_LOG()` itself encapsulates non-trivial logging functionality.
 ## Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
 - Logging support for zf_log (wip)
-- Background section in README: purpose, importance of defensive coding, good practices
+- Improve README
+  - Background: importance of defensive coding, good practices
+  - How to integrate into your own project
 - Example of some real file, before and after
 - Improve Makefile, move to CMake
+  - Separate z_check from examples; probably static lib
+  - CMake for cleanliness and portability
 - Refactor/cleanup/consolidate after adding new functionality
 
 
