@@ -32,18 +32,17 @@ functionality.
 As a basic example, this code:
 ```c
   int rv = foo();
-  Z_CHECK(0 < rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
-```
-is equivalent to:
-```c
-  int rv = foo();
   if (0 > rv) {
-    Z_LOG(Z_LOG_ERROR, "foo returned a bad value! (%d)", rv);
+    Z_LOG(Z_LOG_ERROR, "foo returned a bad value! (%d)", rv); # even this is non-trivial
     status = -1;
     goto cleanup;
   }
 ```
-where `Z_LOG()` itself encapsulates non-trivial logging functionality.
+becomes:
+```c
+  int rv = foo();
+  Z_CHECK(0 < rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
+```
 
 
 ## Wishlist
