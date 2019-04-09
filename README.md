@@ -33,7 +33,7 @@ As a basic example, this code:
 ```c
   int rv = foo();
   if (0 > rv) {
-    Z_LOG(Z_LOG_ERROR, "foo returned a bad value! (%d)", rv); # even this is non-trivial
+    Z_LOG(Z_ERR, "foo returned a bad value! (%d)", rv); # even this is non-trivial
     status = -1;
     goto cleanup;
   }
