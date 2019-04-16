@@ -1,9 +1,11 @@
 # z_check
-An error handling library to enable unobtrusive yet rigorous C error checking. Error checking in C
-is verbose and annoying, but it is also crucial for writing safe and secure programs. This library
-tries to lessen the pain.
+z_check is an error handling library to enable unobtrusive yet rigorous C error checking. Error
+checking in C is verbose and annoying, but it is also crucial for writing safe and secure programs.
+This library tries to help.
 
-The goal of this library is to be as small and generally applicable as possible.
+Primary goal: lower the cognitive load for performing strong error checking.
+
+Secondary goals: simple but capable, small source size, standardized way of doing things.
 
 >Perfection is achieved not when there is nothing more to add, but when there is nothing left to
 >take away.  
