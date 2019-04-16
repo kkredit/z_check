@@ -55,6 +55,8 @@ becomes:
 - Improve Makefile, move to CMake
   - Separate z_check from examples; probably static lib
   - CMake for cleanliness and portability
+- More examples
+  - Programs that exemplify exactly one feature, to contrast with one example that has all
 - Refactor/cleanup/consolidate after adding new functionality
 
 
