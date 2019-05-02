@@ -120,13 +120,17 @@ extern "C"
 #define LABEL_UNUSED __attribute__((unused))
 
 /**
+ * \brief Prevent warnings when compiling with -Wunused-variable
+ */
+#define UNUSED_VARIABLE(var) (void)var
+
+/**
  * \brief Debug versions of each macro 
  *
  * Use same compilation flag as assert(): `NDEBUG`
  */
 #ifdef NDEBUG
-static inline void _macro_unused(const int dummy, ...) {(void)dummy;}
-//#define _macro_unused(dummy, ...) {(void)dummy;}
+static inline void _macro_unused(const int dummy, ...) {UNUSED_VARIABLE(dummy);}
 #define Z_DCT_ASSERT(...)   _macro_unused(__VA_ARGS__)
 #define Z_DRT_ASSERT(...)   _macro_unused(__VA_ARGS__)
 #define Z_DLOG(...)         _macro_unused(__VA_ARGS__)
