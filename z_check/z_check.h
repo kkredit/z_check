@@ -24,6 +24,7 @@ extern "C"
 #include "z_check_guts.h"
 #include <string.h>
 #include <assert.h>
+#include <errno.h>
 
 
 /******************************************************************************
