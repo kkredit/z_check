@@ -20,6 +20,57 @@ extern "C"
 #endif
 
 /******************************************************************************
+ *                                                                  REFERENCE *
+ ******************************************************************************/
+/**
+ * ASSERTS
+ *      Z_CT_ASSERT(condition)
+ *      Z_RT_ASSERT(condition, ...)
+ *
+ * LOGS
+ *      Z_LOG(level, ...)
+ *      Z_LOG_IF(condition, level, ...)
+ *
+ * CHECKS
+ *      Z_CHECK(condition, new_status, level, ...)
+ *      Z_CHECKG(condition, label, new_status, level, ...)
+ *      Z_CHECKC(condition, new_status, level, ...)
+ *
+ * DEBUG MACROS: for the above, replace "Z_" and "Z_D" for -DDEBUG only behavior
+ *
+ * WARNING SUPRESSORS
+ *      UNUSED_VARIABLE(var)
+ *      LABEL_UNUSED
+ *
+ * LOG LEVELS
+ *      Z_EMERG     system is unusable
+ *      Z_ALERT     action must be taken immediately
+ *      Z_CRIT      critical conditions
+ *      Z_ERR       error conditions
+ *      Z_WARN      warning conditions
+ *      Z_NOTICE    normal but significant condition
+ *      Z_INFO      informational
+ *      Z_DEBUG     debug-level messages
+ *
+ * LOG TARGETS
+ *      Z_STDOUT    same as printf()
+ *      Z_STDERR
+ *      Z_ZFLOG     if configured
+ *      Z_SYSLOG    if configured
+ *
+ * METHODS
+ *      void ZLog_Open(ZLogType_t logType, ZLogLevel_t logLevel, const char *moduleName)
+ *      void ZLog_Close(void)
+ *      void ZLog_LevelSet(ZLogLevel_t logLevel)
+ *      void ZLog_LevelReset(void)
+ */
+
+/******************************************************************************
+ *                                                                     SOURCE *
+ ******************************************************************************/
+
+
+/******************************************************************************
  *                                                                 Inclusions */
 #include "z_check_guts.h"
 #include <string.h>
