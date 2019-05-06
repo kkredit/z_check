@@ -36,7 +36,7 @@ extern "C"
  *      Z_CHECKG(condition, label, new_status, level, ...)
  *      Z_CHECKC(condition, new_status, level, ...)
  *
- * DEBUG MACROS: for the above, replace "Z_" and "Z_D" for -DDEBUG only behavior
+ * DEBUG MACROS: for the above, replace "Z_" and "ZD_" for -DDEBUG only behavior
  *
  * WARNING SUPRESSORS
  *      UNUSED_VARIABLE(var)
@@ -182,22 +182,22 @@ extern "C"
  */
 #ifdef NDEBUG
 static inline void _macro_unused(const int dummy, ...) {UNUSED_VARIABLE(dummy);}
-#define Z_DCT_ASSERT(...)   _macro_unused(__VA_ARGS__)
-#define Z_DRT_ASSERT(...)   _macro_unused(__VA_ARGS__)
-#define Z_DLOG(...)         _macro_unused(__VA_ARGS__)
-#define Z_DLOG_IF(...)      _macro_unused(__VA_ARGS__)
-#define Z_DCHECK(...)       _macro_unused(__VA_ARGS__)
-/* Z_DCHECKG: must explicitly exclude the unused goto label */
-#define Z_DCHECKG(condition, label, ...) _macro_unused(condition, __VA_ARGS__)
-#define Z_DCHECKC(...)      _macro_unused(__VA_ARGS__)
+#define ZD_CT_ASSERT(...)   _macro_unused(__VA_ARGS__)
+#define ZD_RT_ASSERT(...)   _macro_unused(__VA_ARGS__)
+#define ZD_LOG(...)         _macro_unused(__VA_ARGS__)
+#define ZD_LOG_IF(...)      _macro_unused(__VA_ARGS__)
+#define ZD_CHECK(...)       _macro_unused(__VA_ARGS__)
+/* ZD_CHECKG: must explicitly exclude the unused goto label */
+#define ZD_CHECKG(condition, label, ...) _macro_unused(condition, __VA_ARGS__)
+#define ZD_CHECKC(...)      _macro_unused(__VA_ARGS__)
 #else
-#define Z_DCT_ASSERT    Z_CT_ASSERT
-#define Z_DRT_ASSERT    Z_RT_ASSERT
-#define Z_DCHECK        Z_CHECK
-#define Z_DCHECKG       Z_CHECKG
-#define Z_DCHECKC       Z_CHECKC
-#define Z_DLOG          Z_LOG
-#define Z_DLOG_IF       Z_LOG_IF
+#define ZD_CT_ASSERT    Z_CT_ASSERT
+#define ZD_RT_ASSERT    Z_RT_ASSERT
+#define ZD_CHECK        Z_CHECK
+#define ZD_CHECKG       Z_CHECKG
+#define ZD_CHECKC       Z_CHECKC
+#define ZD_LOG          Z_LOG
+#define ZD_LOG_IF       Z_LOG_IF
 #endif
 
 /******************************************************************************
