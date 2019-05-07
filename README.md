@@ -60,6 +60,10 @@ becomes:
 - More examples
   - Programs that exemplify exactly one feature, to contrast with one example that has all
 - Refactor/cleanup/consolidate after adding new functionality
+  - And move some functionality out to branches
+  - Z_CHECKG to own branch; not preferred because obscures logic
+  - Z_CHECKC to own branch; not preferred because very rarely needed
+  - Z_ZFLOG to own branch; not preferred because so rarely going to be used
 
 
 ## Name
