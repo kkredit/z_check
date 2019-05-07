@@ -43,7 +43,7 @@ As a basic example, this code:
 becomes:
 ```c
   int rv = foo();
-  Z_CHECK(0 < rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
+  Z_CHECK(0 > rv, -1, Z_ERR, "foo returned a bad value! (%d)", rv);
 ```
 
 
