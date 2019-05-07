@@ -25,16 +25,16 @@ extern "C"
 /**
  * ASSERTS
  *      Z_CT_ASSERT(condition)
- *      Z_RT_ASSERT(condition, ...)
+ *      Z_RT_ASSERT(condition, message...)
  *
  * LOGS
- *      Z_LOG(level, ...)
- *      Z_LOG_IF(condition, level, ...)
+ *      Z_LOG(level, message...)
+ *      Z_LOG_IF(condition, level, message...)
  *
  * CHECKS
- *      Z_CHECK(condition, new_status, level, ...)
- *      Z_CHECKG(condition, label, new_status, level, ...)
- *      Z_CHECKC(condition, new_status, level, ...)
+ *      Z_CHECK(condition, new_status, level, message...)
+ *      Z_CHECKG(condition, label, new_status, level, message...)
+ *      Z_CHECKC(condition, new_status, level, message...)
  *
  * DEBUG MACROS: for the above, replace "Z_" and "ZD_" for -DDEBUG only behavior
  *
