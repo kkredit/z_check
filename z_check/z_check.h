@@ -36,7 +36,7 @@ extern "C"
  *      Z_CHECKG(condition, label, new_status, level, message...)
  *      Z_CHECKC(condition, new_status, level, message...)
  *
- * DEBUG MACROS: for the above, replace "Z_" and "ZD_" for -DDEBUG only behavior
+ * DEBUG MACROS: for the above, replace "Z_" with "ZD_" for -DDEBUG only behavior
  *
  * WARNING SUPRESSORS
  *      UNUSED_VARIABLE(var)
