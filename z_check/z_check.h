@@ -86,7 +86,7 @@ extern "C"
     #error "zf_log logging option not implemented yet"
 #endif
 
-//#define Z_CHECK_STATIC_CONFIG
+#define Z_CHECK_STATIC_CONFIG
 #ifdef Z_CHECK_STATIC_CONFIG
     #undef Z_CHECK_HAS_SYSLOG
 
@@ -96,9 +96,9 @@ extern "C"
     #define Z_ZFLOG     2
     #endif
 
-    #define Z_CHECK_MODULE_NAME        "module_static"
+    #define Z_CHECK_MODULE_NAME        "main"
     #define Z_CHECK_LOG_FUNC           Z_STDOUT
-    #define Z_CHECK_INIT_LOG_LEVEL     Z_INFO
+    #define Z_CHECK_INIT_LOG_LEVEL     Z_DEBUG
 #endif /* Z_CHECK_STATIC_CONFIG */
 
 
