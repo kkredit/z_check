@@ -55,6 +55,7 @@ extern "C"
  * LOG TARGETS
  *      Z_STDOUT    same as printf()
  *      Z_STDERR
+ *      Z_ZFLOG     if configured
  *      Z_SYSLOG    if configured
  *
  * METHODS
@@ -80,6 +81,10 @@ extern "C"
 /******************************************************************************
  *                                                              Configuration */
 #define Z_CHECK_HAS_SYSLOG
+//#define Z_CHECK_HAS_ZF_LOG
+#ifdef Z_CHECK_HAS_ZF_LOG
+    #error "zf_log logging option not implemented yet"
+#endif
 
 #define Z_CHECK_STATIC_CONFIG
 #ifdef Z_CHECK_STATIC_CONFIG
@@ -87,6 +92,9 @@ extern "C"
 
     #define Z_STDOUT    0   /* same as printf() */
     #define Z_STDERR    1
+    #ifdef Z_CHECK_HAS_Z_LOG
+    #define Z_ZFLOG     2
+    #endif
 
     #define Z_CHECK_MODULE_NAME        "main"
     #define Z_CHECK_LOG_FUNC           Z_STDOUT
@@ -213,6 +221,9 @@ typedef enum ZLogType_e
 {
     Z_STDOUT = 0, /* same as printf() */
     Z_STDERR,
+#ifdef Z_CHECK_HAS_Z_LOG
+    Z_ZFLOG,
+#endif
 #ifdef Z_CHECK_HAS_SYSLOG
     Z_SYSLOG,
 #endif

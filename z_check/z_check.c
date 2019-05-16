@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#ifdef Z_CHECK_HAS_ZF_LOG
+#define ZF_LOG_DEF_LEVEL ZF_LOG_VERBOSE
+#include "zf_log/zf_log.h"
+#endif
 #ifdef Z_CHECK_HAS_SYSLOG
 #include <syslog.h>
 #endif
@@ -34,6 +38,15 @@
           (Z_INFO   == (level) ? "INFO" : \
            (Z_DEBUG  == (level) ? "DEBUG" : "UNKNOWN_LEVEL"))))))))
 #define ZL2SYSLOG_LEVEL(level) ((int)level)
+#define ZL2ZFLOG_LEVEL(level) \
+    (Z_EMERG  == (level) ? ZF_LOG_FATAL : \
+     (Z_ALERT  == (level) ? ZF_LOG_FATAL : \
+      (Z_CRIT   == (level) ? ZF_LOG_ERROR : \
+       (Z_ERR    == (level) ? ZF_LOG_ERROR : \
+        (Z_WARN   == (level) ? ZF_LOG_WARN : \
+         (Z_NOTICE == (level) ? ZF_LOG_INFO : \
+          (Z_INFO   == (level) ? ZF_LOG_DEBUG : \
+           (Z_DEBUG  == (level) ? ZF_LOG_VERBOSE : ZF_LOG_NONE))))))))
 
 
 /******************************************************************************
@@ -70,6 +83,8 @@ static const char *m_moduleName = Z_CHECK_MODULE_NAME;
     #define m_ZLogFunc ZLog_StdOut
 #elif Z_CHECK_LOG_FUNC == Z_STDERR
     #define m_ZLogFunc ZLog_StdErr
+#elif Z_CHECK_LOG_FUNC == Z_ZFLOG
+    #define m_ZLogFunc ZLog_ZfLog
 #else
     #error "invalid Z_CHECK_LOG_FUNC"
 #endif
@@ -87,6 +102,9 @@ static inline void ZLog_StdFile(FILE *outfile, ZLogLevel_t level, const char *fi
                                 const char *func);
 static void ZLog_StdErr(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 static void ZLog_StdOut(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+#ifdef Z_CHECK_HAS_ZF_LOG
+static void ZLog_ZfLog(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
+#endif
 #ifdef Z_CHECK_HAS_SYSLOG
 static void ZLog_Syslog(ZLogLevel_t level, const char *file, int line, const char *func) FUNC_USED;
 #endif
@@ -112,6 +130,12 @@ void ZLog_Open(ZLogType_t logType, ZLogLevel_t logLevel, const char *moduleName)
             case Z_STDOUT:
                 m_ZLogFunc = ZLog_StdOut;
                 break;
+
+#ifdef Z_CHECK_HAS_Z_LOG
+            case Z_ZFLOG:
+                m_ZLogFunc = ZLog_ZfLog;
+                break;
+#endif
 
 #ifdef Z_CHECK_HAS_SYSLOG
             case Z_SYSLOG:
@@ -192,6 +216,12 @@ static void ZLog_StdOut(ZLogLevel_t level, const char *file, int line, const cha
 static void ZLog_StdErr(ZLogLevel_t level, const char *file, int line, const char *func) {
     ZLog_StdFile(stderr, level, file, line, func);
 }
+
+#ifdef Z_CHECK_HAS_ZF_LOG
+static void ZLog_ZfLog(ZLogLevel_t level, const char *file, int line, const char *func) {
+    ZF_LOG_WRITE(ZL2ZFLOG_LEVEL(level), "", "%s:%d:%s: %s", file, line, func, m_message);
+}
+#endif
 
 #ifdef Z_CHECK_HAS_SYSLOG
 static void ZLog_Syslog(ZLogLevel_t level, const char *file, int line, const char *func) {

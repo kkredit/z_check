@@ -22,6 +22,7 @@ Secondary goals: simple but capable, small source size, standardized way of doin
     - stdout
     - stderr
     - syslog
+    - zf_log (wip)
 - Debug variants of each macro that compile-out when `NDEBUG` is defined
 - Compiles with `-std=c99` and strict warnings enabled
 
@@ -54,7 +55,7 @@ larger programs, z_check makes a good static library.
 
 ## Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
-- Logging support for zf_log (wip; to remain in own branch)
+- Logging support for zf_log (wip)
 - Improve README
   - Background: importance of defensive coding, good practices
   - How to integrate into your own project
@@ -68,8 +69,9 @@ larger programs, z_check makes a good static library.
   - And move some functionality out to branches
   - Z_CHECKG to own branch; not preferred because obscures logic
   - Z_CHECKC to own branch; not preferred because very rarely needed
+  - Z_ZFLOG to own branch; not preferred because so rarely going to be used
 
 
 ## Name
 The "z" in z_check is inspired by [zf_log](https://github.com/wonder-mice/zf_log), a nice logging
-library that z_check supports as one of its logging options (see zf_log branch).
+library that z_check supports as one of its logging options.
