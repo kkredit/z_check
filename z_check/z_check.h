@@ -33,8 +33,6 @@ extern "C"
  *
  * CHECKS
  *      Z_CHECK(condition, new_status, level, message...)
- *      Z_CHECKG(condition, label, new_status, level, message...)
- *      Z_CHECKC(condition, new_status, level, message...)
  *
  * DEBUG MACROS: for the above, replace "Z_" with "ZD_" for -DDEBUG only behavior
  *
@@ -71,7 +69,6 @@ extern "C"
 
 /******************************************************************************
  *                                                                 Inclusions */
-#include "z_check_guts.h"
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
@@ -92,6 +89,30 @@ extern "C"
     #define Z_CHECK_LOG_FUNC           Z_STDOUT
     #define Z_CHECK_INIT_LOG_LEVEL     Z_DEBUG
 #endif /* Z_CHECK_STATIC_CONFIG */
+
+
+/******************************************************************************
+ *                                                                    Helpers */
+/**
+ * \brief Layers of macros to support static asserts
+ *
+ * \details
+ * Messages end up looking like
+ *   "error: size of array ‘static_assertion_at_line_27’ is negative"
+ * followed by the chain of "in expansion of macro..."s.
+ */
+#define Z_CT_ASSERT_GUTS_LOC(cond, loc) \
+    do { \
+        typedef char static_assertion##loc[(!!(cond))*2-1] __attribute__((unused)); \
+    } while(0)
+#define Z_CT_ASSERT_GUTS_TOKEN_NONSENSE(cond,line) Z_CT_ASSERT_GUTS_LOC(cond,_at_line_##line)
+#define Z_CT_ASSERT_GUTS_LINE(cond,line) Z_CT_ASSERT_GUTS_TOKEN_NONSENSE(cond,line)
+#define Z_CT_ASSERT_GUTS(cond) Z_CT_ASSERT_GUTS_LINE(cond, __LINE__)
+
+/**
+ * \brief Instead of getting the full path, get just the filename
+ */
+#define __FILENAME__ ( strrchr( __FILE__, '/' ) ? strrchr( __FILE__, '/' ) + 1 : __FILE__ )
 
 
 /******************************************************************************
@@ -136,22 +157,16 @@ extern "C"
  *                      present
  * \param[IN]   [integral type] new_status: the new status that gets assigned
  * \param[IN]   ZLogLevel_t level: the importance level of the error
- * \param[IN]   ...: the formatted error message
+ * \param[IN]   __VA_ARGS__: the formatted error message
  */
 #define Z_CHECK(condition, new_status, level, ...) \
-    Z_CHECK_EXT_GOTO(condition, cleanup, status, new_status, level, __VA_ARGS__);
-
-/**
- * \brief A variants of Z_CHECK that lets you name your own 'goto' label
- */
-#define Z_CHECKG(condition, label, new_status, level, ...) \
-    Z_CHECK_EXT_GOTO(condition, label, status, new_status, level, __VA_ARGS__)
-
-/**
- * \brief A variant of Z_CHECK that does not 'goto'
- */
-#define Z_CHECKC(condition, new_status, level, ...) \
-    Z_CHECK_EXT_CONT(condition, status, new_status, level, __VA_ARGS__)
+    do { \
+        if (condition) { \
+            Z_LOG(level, __VA_ARGS__); \
+            status = new_status; \
+            goto cleanup; \
+        } \
+    } while(0)
 
 /**
  * \brief Prevent warnings when compiling with -Wunused-label
@@ -179,15 +194,10 @@ static inline void _macro_unused(const int dummy, ...) {UNUSED_VARIABLE(dummy);}
 #define ZD_LOG(...)         _macro_unused(__VA_ARGS__)
 #define ZD_LOG_IF(...)      _macro_unused(__VA_ARGS__)
 #define ZD_CHECK(...)       _macro_unused(__VA_ARGS__)
-/* ZD_CHECKG: must explicitly exclude the unused goto label */
-#define ZD_CHECKG(condition, label, ...) _macro_unused(condition, __VA_ARGS__)
-#define ZD_CHECKC(...)      _macro_unused(__VA_ARGS__)
 #else
 #define ZD_CT_ASSERT    Z_CT_ASSERT
 #define ZD_RT_ASSERT    Z_RT_ASSERT
 #define ZD_CHECK        Z_CHECK
-#define ZD_CHECKG       Z_CHECKG
-#define ZD_CHECKC       Z_CHECKC
 #define ZD_LOG          Z_LOG
 #define ZD_LOG_IF       Z_LOG_IF
 #endif

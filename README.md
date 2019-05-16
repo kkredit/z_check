@@ -17,7 +17,7 @@ Secondary goals: simple but capable, small source size, standardized way of doin
 - Run-time modification of logging levels (helps with noise)
 - `Z_CT_ASSERT`: simple compile-time asserts
 - `Z_RT_ASSERT`: simple run-time asserts (friendly wrapper around `assert()`)
-- `Z_CHECK` and variants: one-liner error check, logging command, and goto
+- `Z_CHECK`: one-liner error check, logging command, and goto
 - `Z_LOG` and variants: one-liner logging command, configurably printing to
     - stdout
     - stderr
@@ -47,7 +47,7 @@ becomes:
 
 
 ## Integration
-The simplest way to integrate z_check into your project is to copy the three source files to your
+The simplest way to integrate z_check into your project is to copy the two source files to your
 project and integrate with your build system. For small programs, build and link directly. For
 larger programs, z_check makes a good static library.
 
