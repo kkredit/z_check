@@ -51,6 +51,16 @@ The simplest way to integrate z_check into your project is to copy the two sourc
 project and integrate with your build system. For small programs, build and link directly. For
 larger programs, z_check makes a good static library.
 
+## Branches
+There exist a few branches with additional features. These features are excluded from master because
+either they would not be used in most projects or they violate the design value of simplicity.
+- `variants`: contains a few different flavors of Z_CHECK:
+    - Z_CHECKG: you name the label to 'goto'
+    - Z_CHECKC: even if the condition evaluates to true, do not 'goto'
+- `xentoollog`: contains support for xentoollog as a logging target (wip)
+- `zf_log`: contains support for [zf_log](https://github.com/wonder-mice/zf_log) as a logging target
+    (wip)
+
 
 ## Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
@@ -66,8 +76,6 @@ larger programs, z_check makes a good static library.
   - Programs that exemplify exactly one feature, to contrast with one example that has all
 - Refactor/cleanup/consolidate after adding new functionality
   - And move some functionality out to branches
-  - Z_CHECKG to own branch; not preferred because obscures logic
-  - Z_CHECKC to own branch; not preferred because very rarely needed
 
 
 ## Name
