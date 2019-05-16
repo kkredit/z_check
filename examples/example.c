@@ -21,6 +21,7 @@
 static int testExampleAsserts(void);
 static int testExampleLogs(void);
 static int testExampleChecks(void);
+static int testExampleCheckGs(void);
 
 
 /******************************************************************************
@@ -43,10 +44,13 @@ int main(void) {
     Z_CHECK(0 != status, -1, Z_ERR, "[X] testExampleLogs failed!");
 
     status = testExampleChecks();
-    Z_CHECK(0 != status, -1, Z_ERR,
-             "[+] testExampleChecks failed! (as expected) status = %d", status);
+    Z_CHECK(0 != status, -1, Z_ERR, "[X] testExampleChecks failed!");
 
-    /* Because testExampleChecks() is expected to fail and the action is set to goto cleanup,
+    status = testExampleCheckGs();
+    Z_CHECK(0 != status, -1, Z_ERR,
+             "[+] testExampleCheckGs failed! (as expected) status = %d", status);
+
+    /* Because testExampleCheckGs() is expected to fail and the action is set to goto cleanup,
      * this message will not print. */
     Z_LOG(Z_ERR, "[X] this will not print");
 
@@ -121,15 +125,47 @@ int testExampleChecks(void) {
     rvOfSomeOperation = 0;
     Z_CHECK(0 != rvOfSomeOperation, -1, Z_ERR, "[X] this not will occur");
 
+
+    /* Z_CHECKC is the same as Z_CHECK, except it continues even if the condition is true. */
+    rvOfSomeOperation = -1;
+    Z_CHECKC(0 != rvOfSomeOperation, status, Z_WARN,
+              "[+] this will occur, but since Z_CHECKC continues, processing will go on");
+
     Z_CHECK(false, -1, Z_ERR, "[X] this will not occur");
 
-    /* This will be tested when NDEBUG is not defined. */
+    /* These will be tested when NDEBUG is not defined. */
     ZD_CHECK(false, -1, Z_ERR, "[X] this not will occur");
-
-    /* This will occur. */
-    Z_CHECK(2 + 2 == 4, -1, Z_ERR, "[+] this will fail");
+    ZD_CHECKC(true, 0, Z_ERR, "[+] this will occur when NDEBUG is not defined, but is not fatal");
 
 cleanup:
+    return status;
+}
+
+int testExampleCheckGs(void) {
+    int status = 0;
+
+    /* Try out the Z_CHECKG macro.
+     *
+     * This is the same as Z_CHECK, except it lets you define the 'goto' tag. */
+
+    /* e.g., malloc Thing1 */
+    Z_CHECKG(false, err1, -1, Z_ERR, "[X] this not will occur");
+    /* e.g., malloc Thing2 */
+    ZD_CHECKG(false, err2, -1, Z_ERR, "[X] this will not occur");
+    /* e.g., malloc Thing3 */
+    Z_CHECKG(true, err3, -2, Z_ERR, "[+] this will occur");
+
+    return status;
+err3:
+    /* err3 specific cleanup steps, e.g. free Thing3 */
+err2:
+    /* Since this label is referenced only when NDEBUG is not defined, when compiling with
+     * -Wunused-label, LABEL_UNUSED is needed to prevent a compiler warning. */
+    LABEL_UNUSED;
+
+    /* err2 specific cleanup steps, e.g. free Thing2 */
+err1:
+    /* err1 specific cleanup steps, e.g. free Thing1 */
     return status;
 }
 
