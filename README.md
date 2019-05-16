@@ -47,6 +47,12 @@ becomes:
 ```
 
 
+## Integration
+The simplest way to integrate z_check into your project is to copy the three source files to your
+project and integrate with your build system. For small programs, build and link directly. For
+larger programs, z_check makes a good static library.
+
+
 ## Wishlist
 - `Z_CHECK` variant that doesn't require `status` variable
 - Logging support for zf_log (wip)
