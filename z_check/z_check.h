@@ -183,7 +183,7 @@ extern "C"
 #define UNUSED_VARIABLE(var) (void)var
 
 /**
- * \brief Debug versions of each macro 
+ * \brief Debug versions of each macro
  *
  * Use same compilation flag as assert(): `NDEBUG`
  */
