@@ -76,19 +76,23 @@ extern "C"
 
 /******************************************************************************
  *                                                              Configuration */
-#define Z_CHECK_HAS_SYSLOG
 
-#define Z_CHECK_STATIC_CONFIG
+/**
+ * Configuration instructions: Only change lines that contain the "SET" comment.
+ */
+
+#define Z_CHECK_HAS_SYSLOG      /* SET -- comment out if syslog not supported */
+#define Z_CHECK_STATIC_CONFIG   /* SET -- comment out if using static config */
+
 #ifdef Z_CHECK_STATIC_CONFIG
     #undef Z_CHECK_HAS_SYSLOG
-
     #define Z_STDOUT    0   /* same as printf() */
     #define Z_STDERR    1
 
-    #define Z_CHECK_MODULE_NAME        "main"
-    #define Z_CHECK_LOG_FUNC           Z_STDOUT
-    #define Z_CHECK_INIT_LOG_LEVEL     Z_DEBUG
-#endif /* Z_CHECK_STATIC_CONFIG */
+    #define Z_CHECK_MODULE_NAME     "main"      /* SET */
+    #define Z_CHECK_LOG_FUNC        Z_STDOUT    /* SET */
+    #define Z_CHECK_INIT_LOG_LEVEL  Z_DEBUG     /* SET */
+#endif
 
 
 /******************************************************************************
@@ -227,7 +231,7 @@ typedef enum ZLogType_e
     Z_SYSLOG,
 #endif
 } ZLogType_t;
-#endif
+#endif /* Z_CHECK_STATIC_CONFIG */
 
 
 /******************************************************************************
