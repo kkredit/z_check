@@ -29,7 +29,7 @@ CFLAGS+=-Wall -Wextra -Wpedantic -Werror \
 		-Wreturn-type -Wshadow -Wstrict-prototypes -Wunused -Wuninitialized \
 		-Wdeclaration-after-statement -Wmissing-prototypes \
 		-Wmissing-declarations -Wundef -fstrict-aliasing -Wstrict-aliasing=3 \
-		-Wformat=2 \
+		-Wformat=2 -Wsuggest-attribute=pure -Wsuggest-attribute=const \
 		-O0 -ggdb3 \
 		-std=c99 -D_POSIX_C_SOURCE=200112L
 #CFLAGS +=-Wunused-macros
