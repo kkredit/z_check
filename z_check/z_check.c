@@ -22,7 +22,9 @@
 
 /******************************************************************************
  *                                                                    Defines */
-#define DEFAULT_MODULE_NAME "Unnamed Module"
+#ifndef Z_CHECK_STATIC_CONFIG
+    #define DEFAULT_MODULE_NAME "Unnamed Module"
+#endif
 #define MESSAGE_MAX_LEN 512
 #define ZL_STR(level) \
     (Z_EMERG  == (level) ? "EMERGENCY" : \
@@ -33,7 +35,9 @@
          (Z_NOTICE == (level) ? "NOTICE" : \
           (Z_INFO   == (level) ? "INFO" : \
            (Z_DEBUG  == (level) ? "DEBUG" : "UNKNOWN_LEVEL"))))))))
-#define ZL2SYSLOG_LEVEL(level) ((int)level)
+#ifdef Z_CHECK_HAS_SYSLOG
+    #define ZL2SYSLOG_LEVEL(level) ((int)level)
+#endif
 
 
 /******************************************************************************

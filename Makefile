@@ -32,7 +32,7 @@ CFLAGS+=-Wall -Wextra -Wpedantic -Werror \
 		-Wformat=2 -Wsuggest-attribute=pure -Wsuggest-attribute=const \
 		-O0 -ggdb3 \
 		-std=c99 -D_POSIX_C_SOURCE=200112L
-#CFLAGS +=-Wunused-macros
+CFLAGS +=-Wunused-macros
 LDFLAGS+= $(foreach dir,$(INCDIRS),-I$(dir))
 
 .PHONY: all
