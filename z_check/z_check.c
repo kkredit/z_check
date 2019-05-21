@@ -23,7 +23,7 @@
 /******************************************************************************
  *                                                                    Defines */
 #ifndef Z_CHECK_STATIC_CONFIG
-    #define DEFAULT_MODULE_NAME "Unnamed Module"
+    #define DEFAULT_MODULE_NAME ""
 #endif
 
 #define MESSAGE_MAX_LEN 512
