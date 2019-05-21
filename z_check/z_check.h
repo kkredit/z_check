@@ -91,7 +91,7 @@ extern "C"
 
     #define Z_CHECK_MODULE_NAME     "main"      /* SET */
     #define Z_CHECK_LOG_FUNC        Z_STDOUT    /* SET */
-    #define Z_CHECK_INIT_LOG_LEVEL  Z_DEBUG     /* SET */
+    #define Z_CHECK_INIT_LOG_LEVEL  Z_INFO     /* SET */
 #endif
 
 
