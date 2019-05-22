@@ -78,4 +78,8 @@ either they would not be used in most projects or they violate the design value 
 
 ## Name
 The "z" in z_check is inspired by [zf_log](https://github.com/wonder-mice/zf_log), a nice logging
-library that z_check supports as one of its logging options (see zf_log branch).
+library that z_check supports as one of its logging options (see zf_log branch). It has a few
+benefits:
+- Prefix is needed to prevent namespace collisions
+- Z is a rarely used character
+- It is short
