@@ -22,15 +22,16 @@
 
 /******************************************************************************
  *                                                                    Defines */
-#ifndef Z_CHECK_STATIC_CONFIG
+#ifdef Z_CHECK_STATIC_CONFIG
+    #define FUNC_MAYBE_UNUSED __attribute__((unused))
+#else
     #define DEFAULT_MODULE_NAME ""
+    #define FUNC_MAYBE_UNUSED
 #endif
 
-#define MESSAGE_MAX_LEN 512
-
-#define MAX_LEVEL_INDEX ((int)Z_DEBUG)
-
 #define CONST_FUNC __attribute__((const))
+#define MESSAGE_MAX_LEN 512
+#define MAX_LEVEL_INDEX ((int)Z_DEBUG)
 
 #ifdef Z_CHECK_HAS_SYSLOG
     #define ZL2SYSLOG_LEVEL(level) ((int)level)
@@ -44,6 +45,21 @@ typedef void (*ZLogFn_t)(const ZLogLevel_t level, const char const *file, const 
 
 
 /******************************************************************************
+ *                                                      Function declarations */
+static inline const char const * ZLog_LevelStr(const ZLogLevel_t level) CONST_FUNC;
+static inline void ZLog_StdFile(FILE *outfile, const ZLogLevel_t level, const char const *file,
+                                const int line, const char const *func, const char const *message);
+static void ZLog_StdErr(const ZLogLevel_t level, const char const *file, const int line,
+                        const char const *func, const char const *message) FUNC_MAYBE_UNUSED;
+static void ZLog_StdOut(const ZLogLevel_t level, const char const *file, const int line,
+                        const char const *func, const char const *message) FUNC_MAYBE_UNUSED;
+#ifdef Z_CHECK_HAS_SYSLOG
+static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const int line,
+                        const char const *func, const char const *message) FUNC_MAYBE_UNUSED;
+#endif
+
+
+/******************************************************************************
  *                                                                       Data */
 #ifndef Z_CHECK_STATIC_CONFIG
     /* Dynamically configured */
@@ -51,8 +67,6 @@ typedef void (*ZLogFn_t)(const ZLogLevel_t level, const char const *file, const 
     static ZLogFn_t m_ZLogFunc = NULL;
     static ZLogLevel_t m_logLevel;
     static ZLogLevel_t m_logLevelOrig;
-
-    #define FUNC_USED
 #else
     /* Statically configured */
     #if !defined(Z_CHECK_MODULE_NAME) || !defined(Z_CHECK_LOG_FUNC) || !defined(Z_CHECK_INIT_LOG_LEVEL)
@@ -62,18 +76,18 @@ typedef void (*ZLogFn_t)(const ZLogLevel_t level, const char const *file, const 
         #error "Syslog version of Z_CHECK requires dynamic configuration"
     #endif
 
-    #define FUNC_USED  __attribute__((unused))
+    static const char const *m_moduleName = Z_CHECK_MODULE_NAME;
 
-    static const char *m_moduleName = Z_CHECK_MODULE_NAME;
     #if Z_CHECK_LOG_FUNC == Z_STDOUT
-        #define m_ZLogFunc ZLog_StdOut
+        static const ZLogFn_t m_ZLogFunc = ZLog_StdOut;
     #elif Z_CHECK_LOG_FUNC == Z_STDERR
-        #define m_ZLogFunc ZLog_StdErr
+        static const ZLogFn_t m_ZLogFunc = ZLog_StdErr;
     #else
         #error "invalid Z_CHECK_LOG_FUNC"
     #endif
+
     static ZLogLevel_t m_logLevel = Z_CHECK_INIT_LOG_LEVEL;
-    static ZLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
+    static const ZLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
 #endif
 
 static const char const *m_levelStrs[] = {
@@ -86,21 +100,6 @@ static const char const *m_levelStrs[] = {
     "INFO",
     "DEBUG",
 };
-
-
-/******************************************************************************
- *                                                      Function declarations */
-static inline const char const * ZLog_LevelStr(const ZLogLevel_t level) CONST_FUNC;
-static inline void ZLog_StdFile(FILE *outfile, const ZLogLevel_t level, const char const *file,
-                                const int line, const char const *func, const char const *message);
-static void ZLog_StdErr(const ZLogLevel_t level, const char const *file, const int line,
-                        const char const *func, const char const *message) FUNC_USED;
-static void ZLog_StdOut(const ZLogLevel_t level, const char const *file, const int line,
-                        const char const *func, const char const *message) FUNC_USED;
-#ifdef Z_CHECK_HAS_SYSLOG
-static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const int line,
-                        const char const *func, const char const *message) FUNC_USED;
-#endif
 
 
 /******************************************************************************
