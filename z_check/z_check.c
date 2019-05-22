@@ -25,8 +25,8 @@
 #ifdef Z_CHECK_STATIC_CONFIG
     #define FUNC_MAYBE_UNUSED __attribute__((unused))
 #else
-    #define DEFAULT_MODULE_NAME ""
     #define FUNC_MAYBE_UNUSED
+    #define DEFAULT_MODULE_NAME ""
 #endif
 
 #define CONST_FUNC __attribute__((const))
@@ -34,7 +34,7 @@
 #define MAX_LEVEL_INDEX ((int)Z_DEBUG)
 
 #ifdef Z_CHECK_HAS_SYSLOG
-    #define ZL2SYSLOG_LEVEL(level) ((int)level)
+    #define PURE_FUNC __attribute__((pure))
 #endif
 
 
@@ -54,6 +54,7 @@ static void ZLog_StdErr(const ZLogLevel_t level, const char const *file, const i
 static void ZLog_StdOut(const ZLogLevel_t level, const char const *file, const int line,
                         const char const *func, const char const *message) FUNC_MAYBE_UNUSED;
 #ifdef Z_CHECK_HAS_SYSLOG
+static inline int ZLog_Level2Syslog(const ZLogLevel_t level) PURE_FUNC;
 static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const int line,
                         const char const *func, const char const *message) FUNC_MAYBE_UNUSED;
 #endif
@@ -215,9 +216,13 @@ static void ZLog_StdErr(const ZLogLevel_t level, const char const *file, const i
 }
 
 #ifdef Z_CHECK_HAS_SYSLOG
+static inline int ZLog_Level2Syslog(const ZLogLevel_t level) {
+    return (int)level;
+}
+
 static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const int line,
                         const char const *func, const char const *message) {
-    syslog(ZL2SYSLOG_LEVEL(level), "[%s] %s:%d:%s: %s",
+    syslog(ZLog_Level2Syslog(level), "[%s] %s:%d:%s: %s",
            ZLog_LevelStr(level), file, line, func, message);
 }
 #endif
