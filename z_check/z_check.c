@@ -165,12 +165,17 @@ void ZLog_LevelReset(void) {
 
 void ZLog(const ZLogLevel_t level, const char const *file, const int line, const char const *func,
           const char *format, ...) {
+
 #ifndef Z_CHECK_STATIC_CONFIG
     if (NULL == m_ZLogFunc) {
         fprintf(stderr, "Error: May not use ZLog() before calling ZLog_Open()\n");
     }
     else
 #endif /* Z_CHECK_STATIC_CONFIG */
+
+    ZD_RT_ASSERT((0 <= (int)level && MAX_LEVEL_INDEX >= (int)level),
+                 "log level is an invalid value: %d", (int)level);
+
     if (m_logLevel >= level) {
         int rc;
         va_list args;
@@ -192,9 +197,7 @@ void ZLog(const ZLogLevel_t level, const char const *file, const int line, const
 /******************************************************************************
  *                                                         Internal functions */
 static inline const char const * ZLog_LevelStr(const ZLogLevel_t level) {
-    int index = (int)level;
-    ZD_RT_ASSERT((0 <= index && MAX_LEVEL_INDEX >= index), "log level is an invalid value");
-    return m_levelStrs[index];
+    return m_levelStrs[(int)level];
 }
 
 static inline void ZLog_StdFile(FILE *outfile, const ZLogLevel_t level, const char const *file,
