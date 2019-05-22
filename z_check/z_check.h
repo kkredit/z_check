@@ -245,7 +245,7 @@ typedef enum ZLogType_e
  *
  * \param[IN]   ZLogType_t logType: Desired log type
  * \param[IN]   ZLogLevel_t logLevel: Desired log level (inclusive)
- * \param[IN]   const char * moduleName: Name of module
+ * \param[IN]   char * moduleName: Name of module
  */
 void ZLog_Open(const ZLogType_t logType, const ZLogLevel_t logLevel, const char const *moduleName);
 
@@ -276,10 +276,10 @@ void ZLog_LevelReset(void);
  * \pre Logger must be intialized with ZLog_Open
  *
  * \param[IN]   ZLogLevel_t level: Error level of message
- * \param[IN]   const char * file: File where log is called
+ * \param[IN]   char * file: File where log is called
  * \param[IN]   int line: Line where log is called
- * \param[IN]   const char * func: Function where log is called
- * \param[IN]   const char * format: Error message
+ * \param[IN]   char * func: Function where log is called
+ * \param[IN]   char * format: Error message
  */
 void ZLog(const ZLogLevel_t level, const char const *file, const int line, const char const *func,
           const char const *format, ...) __attribute__((format(printf, 5, 6)));
