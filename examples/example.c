@@ -17,6 +17,20 @@
 
 
 /******************************************************************************
+ *                                                                    Defines */
+
+/* Z_CT_ASSERT_DECL performs compile-time asserts. Naturally, you can only use it to test
+ * information known to the compiler during the build.
+ *
+ * Note that Z_CT_ASSERT_DECL is for use outside of functions. Z_CT_ASSERT_CODE is for use in
+ * functions.
+ *
+ * Uncomment the second statement to see it in action. */
+Z_CT_ASSERT_DECL(sizeof(int) == sizeof(unsigned));
+//Z_CT_ASSERT_DECL(sizeof(int) == sizeof(long));
+
+
+/******************************************************************************
  *                                                      Function declarations */
 static int testExampleAsserts(void);
 static int testExampleLogs(void);
@@ -33,7 +47,7 @@ int main(void) {
      * z_log supports static as well as dynamic configuration. The Open() and Close() functions
      * are for dynamic (runtime) configuration. To try dynamic configuration, un-comment-out
      * `ZLog_Open()` and `ZLog_cClose()`, then un-define `Z_CHECK_STATIC_CONFIG` in z_check.h. */
-//  ZLog_Open(Z_STDOUT, Z_INFO, "example_dynamic");
+    //ZLog_Open(Z_STDOUT, Z_INFO, "example_dynamic");
 
     /* Try out the features. */
     status = testExampleAsserts();
@@ -53,7 +67,7 @@ int main(void) {
     /* Use 'cleanup' tag to mark the end of the function, including actual clean up code. */
 cleanup:
     Z_LOG_IF(0 != status, Z_INFO, "[+] returning");
-//  ZLog_Close();
+    //ZLog_Close();
     return status;
 }
 
@@ -63,14 +77,17 @@ cleanup:
 int testExampleAsserts(void) {
     int status = 0;
 
-    /* Z_CT_ASSERT performs compile-time asserts. Naturally, you can only use it to test
+    /* Z_CT_ASSERT_CODE performs compile-time asserts. Naturally, you can only use it to test
      * information known to the compiler during the build.
+     *
+     * Note that Z_CT_ASSERT_CODE is for use in functions. Z_CT_ASSERT_DECL is for use outside of
+     * functions.
      *
      * Uncomment the second statement to see it in action. */
 
-    Z_CT_ASSERT(2 + 2 == 4);
-    //Z_CT_ASSERT(2 + 2 == 5);
-    ZD_CT_ASSERT(2 + 2 == 4);
+    Z_CT_ASSERT_CODE(2 + 2 == 4);
+    //Z_CT_ASSERT_CODE(2 + 2 == 5);
+    ZD_CT_ASSERT_CODE(2 + 2 == 4);
 
     /* Z_RT_ASSERT performs run-time asserts. It is a wrapper around assert() that allows
      * you to define human friendly messages while debugging.

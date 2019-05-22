@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #ifdef Z_CHECK_HAS_SYSLOG
 #include <syslog.h>
 #endif
@@ -25,17 +26,14 @@
 #ifdef Z_CHECK_STATIC_CONFIG
     #define FUNC_MAYBE_UNUSED __attribute__((unused))
 #else
+    #define PURE_FUNC __attribute__((pure))
     #define FUNC_MAYBE_UNUSED
-    #define DEFAULT_MODULE_NAME ""
+    #define DEFAULT_MODULE_NAME "z_check"
 #endif
 
 #define CONST_FUNC __attribute__((const))
 #define MESSAGE_MAX_LEN 512
-#define MAX_LEVEL_INDEX ((int)Z_DEBUG)
-
-#ifdef Z_CHECK_HAS_SYSLOG
-    #define PURE_FUNC __attribute__((pure))
-#endif
+#define MAX_LEGAL_LEVEL ((unsigned)Z_DEBUG)
 
 
 /******************************************************************************
@@ -46,6 +44,12 @@ typedef void (*ZLogFn_t)(const ZLogLevel_t level, const char const *file, const 
 
 /******************************************************************************
  *                                                      Function declarations */
+#ifndef Z_CHECK_STATIC_CONFIG
+static void ZLog_ModuleNameInit(const char const *moduleName);
+static ZLogLevel_t ZLog_LevelSanitize(const ZLogLevel_t logLevel);
+static inline bool ZLog_LevelIsLegal(const ZLogLevel_t level) PURE_FUNC;
+#endif
+static inline bool ZLog_LevelPasses(const ZLogLevel_t level) CONST_FUNC;
 static inline const char const * ZLog_LevelStr(const ZLogLevel_t level) CONST_FUNC;
 static inline void ZLog_StdFile(FILE *outfile, const ZLogLevel_t level, const char const *file,
                                 const int line, const char const *func, const char const *message);
@@ -64,7 +68,7 @@ static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const i
  *                                                                       Data */
 #ifndef Z_CHECK_STATIC_CONFIG
     /* Dynamically configured */
-    static const char *m_moduleName = NULL;
+    static char m_moduleName[Z_CHECK_MODULE_NAME_MAX_LEN] = {0};
     static ZLogFn_t m_ZLogFunc = NULL;
     static ZLogLevel_t m_logLevel;
     static ZLogLevel_t m_logLevelOrig;
@@ -87,6 +91,7 @@ static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const i
         #error "invalid Z_CHECK_LOG_FUNC"
     #endif
 
+    Z_CT_ASSERT_DECL(Z_CHECK_INIT_LOG_LEVEL <= MAX_LEGAL_LEVEL);
     static ZLogLevel_t m_logLevel = Z_CHECK_INIT_LOG_LEVEL;
     static const ZLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
 #endif
@@ -111,9 +116,11 @@ void ZLog_Open(const ZLogType_t logType, const ZLogLevel_t logLevel, const char 
         Z_LOG(Z_WARN, "called ZLog_Open() twice in same module, %s", m_moduleName);
     }
     else {
-        m_moduleName = (NULL != moduleName) ? moduleName : DEFAULT_MODULE_NAME;
-        m_logLevel = logLevel;
-        m_logLevelOrig = logLevel;
+        const ZLogLevel_t sanitizedLogLevel = ZLog_LevelSanitize(logLevel);
+        ZLog_ModuleNameInit(moduleName);
+
+        m_logLevel = sanitizedLogLevel;
+        m_logLevelOrig = sanitizedLogLevel;
 
         switch (logType) {
             case Z_STDERR:
@@ -149,7 +156,7 @@ void ZLog_Close(void) {
 #endif
 
     m_ZLogFunc = NULL;
-    m_moduleName = NULL;
+    memset(m_moduleName, 0, sizeof(m_moduleName));
 }
 #endif /* Z_CHECK_STATIC_CONFIG */
 
@@ -170,10 +177,7 @@ void ZLog(const ZLogLevel_t level, const char const *file, const int line, const
     else
 #endif
 
-    ZD_RT_ASSERT((0 <= (int)level && MAX_LEVEL_INDEX >= (int)level),
-                 "log level is an invalid value: %d", (int)level);
-
-    if (m_logLevel >= level) {
+    if (ZLog_LevelPasses(level)) {
         int rc;
         va_list args;
         char message[MESSAGE_MAX_LEN] = { 0 };
@@ -195,7 +199,37 @@ void ZLog(const ZLogLevel_t level, const char const *file, const int line, const
 
 /******************************************************************************
  *                                                         Internal functions */
+#ifndef Z_CHECK_STATIC_CONFIG
+static void ZLog_ModuleNameInit(const char const *moduleName) {
+    const char const *moduleNameToUse = (NULL != moduleName) ? moduleName : DEFAULT_MODULE_NAME;
+    (void)strncpy(m_moduleName, moduleNameToUse, Z_CHECK_MODULE_NAME_MAX_LEN - 1);
+}
+
+static ZLogLevel_t ZLog_LevelSanitize(const ZLogLevel_t logLevel) {
+    ZLogLevel_t sanitizedLevel = logLevel;
+    if (!ZLog_LevelIsLegal(logLevel)) {
+        /* don't have Z_LOG setup yet to use */
+        fprintf(stderr, "Warning: Invalid log level (%u); falling back to MAX_LEGAL_LEVEL (%u)\n",
+                (unsigned)logLevel, MAX_LEGAL_LEVEL);
+        sanitizedLevel = MAX_LEGAL_LEVEL;
+    }
+    return sanitizedLevel;
+}
+
+static inline bool ZLog_LevelIsLegal(const ZLogLevel_t level) {
+    return (MAX_LEGAL_LEVEL >= (unsigned)level);
+}
+#endif /* Z_CHECK_STATIC_CONFIG */
+
+static inline bool ZLog_LevelPasses(const ZLogLevel_t level) {
+    return ((unsigned)level <= (unsigned)m_logLevel);
+}
+
 static inline const char const * ZLog_LevelStr(const ZLogLevel_t level) {
+    /* Do not need a runtime assert that the log level is in range because of two checks:
+     *  (1): levels > m_logLevel are thrown out in ZLog_LevelPasses()
+     *  (2): m_logLevels > MAX_LEVEL_INDEX are thrown out in Z_CT_ASSERTs in static config and
+     *          with input sanitization in dynamic config. */
     return m_levelStrs[(int)level];
 }
 

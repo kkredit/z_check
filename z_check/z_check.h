@@ -24,8 +24,9 @@ extern "C"
  ******************************************************************************/
 /**
  * ASSERTS
- *      Z_CT_ASSERT(condition)
- *      Z_RT_ASSERT(condition, message...)
+ *      Z_CT_ASSERT_DECL(condition)             for use outside of functions
+ *      Z_CT_ASSERT_CODE(condition)             for use in functions
+ *      Z_RT_ASSERT(condition, message...)      for use in functions
  *
  * LOGS
  *      Z_LOG(level, message...)
@@ -91,7 +92,9 @@ extern "C"
 
     #define Z_CHECK_MODULE_NAME     "main"      /* SET */
     #define Z_CHECK_LOG_FUNC        Z_STDOUT    /* SET */
-    #define Z_CHECK_INIT_LOG_LEVEL  Z_INFO     /* SET */
+    #define Z_CHECK_INIT_LOG_LEVEL  Z_INFO      /* SET */
+#else
+    #define Z_CHECK_MODULE_NAME_MAX_LEN 16
 #endif
 
 
@@ -106,11 +109,9 @@ extern "C"
  * followed by the chain of "in expansion of macro..."s.
  */
 #define Z_CT_ASSERT_GUTS_LOC(cond, loc) \
-    do { \
-        typedef char static_assertion##loc[(!!(cond))*2-1] __attribute__((unused)); \
-    } while(0)
-#define Z_CT_ASSERT_GUTS_TOKEN_NONSENSE(cond,line) Z_CT_ASSERT_GUTS_LOC(cond,_at_line_##line)
-#define Z_CT_ASSERT_GUTS_LINE(cond,line) Z_CT_ASSERT_GUTS_TOKEN_NONSENSE(cond,line)
+    typedef char static_assertion##loc[(!!(cond))*2-1] __attribute__((unused))
+#define Z_CT_ASSERT_GUTS_DETOKENIZE(cond,line) Z_CT_ASSERT_GUTS_LOC(cond,_at_line_##line)
+#define Z_CT_ASSERT_GUTS_LINE(cond,line) Z_CT_ASSERT_GUTS_DETOKENIZE(cond,line)
 #define Z_CT_ASSERT_GUTS(cond) Z_CT_ASSERT_GUTS_LINE(cond, __LINE__)
 
 /**
@@ -121,7 +122,12 @@ extern "C"
 
 /******************************************************************************
  *                                                                    Defines */
-#define Z_CT_ASSERT(condition) Z_CT_ASSERT_GUTS(condition)
+#define Z_CT_ASSERT_DECL(condition) Z_CT_ASSERT_GUTS(condition)
+
+#define Z_CT_ASSERT_CODE(condition) \
+    do { \
+        Z_CT_ASSERT_GUTS(condition); \
+    } while(0)
 
 #define Z_RT_ASSERT(condition, ...) \
     do { \
@@ -193,17 +199,19 @@ extern "C"
  */
 #ifdef NDEBUG
 static inline void _macro_unused(const int dummy, ...) {UNUSED_VARIABLE(dummy);}
-#define ZD_CT_ASSERT(...)   _macro_unused(__VA_ARGS__)
-#define ZD_RT_ASSERT(...)   _macro_unused(__VA_ARGS__)
-#define ZD_LOG(...)         _macro_unused(__VA_ARGS__)
-#define ZD_LOG_IF(...)      _macro_unused(__VA_ARGS__)
-#define ZD_CHECK(...)       _macro_unused(__VA_ARGS__)
+#define ZD_CT_ASSERT_DECL(...)  _macro_unused(__VA_ARGS__)
+#define ZD_CT_ASSERT_CODE(...)  _macro_unused(__VA_ARGS__)
+#define ZD_RT_ASSERT(...)       _macro_unused(__VA_ARGS__)
+#define ZD_LOG(...)             _macro_unused(__VA_ARGS__)
+#define ZD_LOG_IF(...)          _macro_unused(__VA_ARGS__)
+#define ZD_CHECK(...)           _macro_unused(__VA_ARGS__)
 #else
-#define ZD_CT_ASSERT    Z_CT_ASSERT
-#define ZD_RT_ASSERT    Z_RT_ASSERT
-#define ZD_CHECK        Z_CHECK
-#define ZD_LOG          Z_LOG
-#define ZD_LOG_IF       Z_LOG_IF
+#define ZD_CT_ASSERT_DECL   Z_CT_ASSERT_DECL
+#define ZD_CT_ASSERT_CODE   Z_CT_ASSERT_CODE
+#define ZD_RT_ASSERT        Z_RT_ASSERT
+#define ZD_CHECK            Z_CHECK
+#define ZD_LOG              Z_LOG
+#define ZD_LOG_IF           Z_LOG_IF
 #endif
 
 /******************************************************************************
