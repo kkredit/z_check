@@ -56,7 +56,7 @@ static void ZLog_StdOut(const ZLogLevel_t level, const char const *file, const i
 #ifdef Z_CHECK_HAS_SYSLOG
 static inline int ZLog_Level2Syslog(const ZLogLevel_t level) PURE_FUNC;
 static void ZLog_Syslog(const ZLogLevel_t level, const char const *file, const int line,
-                        const char const *func, const char const *message) FUNC_MAYBE_UNUSED;
+                        const char const *func, const char const *message);
 #endif
 
 
