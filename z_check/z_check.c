@@ -96,17 +96,6 @@ static void ZLog_Syslog(const ZLogLevel_t level, const char * const file, const 
     static const ZLogLevel_t m_logLevelOrig = Z_CHECK_INIT_LOG_LEVEL;
 #endif
 
-static const char * const m_levelStrs[] = {
-    "EMERGENCY",
-    "ALERT",
-    "CRITICAL",
-    "ERROR",
-    "WARNING",
-    "NOTICE",
-    "INFO",
-    "DEBUG",
-};
-
 
 /******************************************************************************
  *                                                         External functions */
@@ -230,7 +219,17 @@ static inline const char * ZLog_LevelStr(const ZLogLevel_t level) {
      *  (1): levels > m_logLevel are thrown out in ZLog_LevelPasses()
      *  (2): m_logLevels > MAX_LEVEL_INDEX are thrown out in Z_CT_ASSERTs in static config and
      *          with input sanitization in dynamic config. */
-    return m_levelStrs[(int)level];
+    const char * const levelStrs[] = {
+        "EMERGENCY",
+        "ALERT",
+        "CRITICAL",
+        "ERROR",
+        "WARNING",
+        "NOTICE",
+        "INFO",
+        "DEBUG",
+    };
+    return levelStrs[(int)level];
 }
 
 static inline void ZLog_StdFile(FILE *outfile, const ZLogLevel_t level, const char * const file,
