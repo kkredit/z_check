@@ -26,12 +26,12 @@
 #ifdef Z_CHECK_STATIC_CONFIG
     #define FUNC_MAYBE_UNUSED __attribute__((unused))
 #else
-    #define PURE_FUNC __attribute__((pure))
     #define FUNC_MAYBE_UNUSED
     #define DEFAULT_MODULE_NAME "z_check"
 #endif
 
-#define CONST_FUNC __attribute__((const))
+#define PURE_FUNC __attribute__((pure))     /* no side effects, global memory read-only */
+#define CONST_FUNC __attribute__((const))   /* no side effects, no global memory access */
 #define MESSAGE_MAX_LEN 512
 #define MAX_LEGAL_LEVEL ((unsigned)Z_DEBUG)
 
@@ -47,9 +47,10 @@ typedef void (*ZLogFn_t)(const ZLogLevel_t level, const char * const file, const
 #ifndef Z_CHECK_STATIC_CONFIG
 static void ZLog_ModuleNameInit(const char * const moduleName);
 static ZLogLevel_t ZLog_LevelSanitize(const ZLogLevel_t logLevel);
-static inline bool ZLog_LevelIsLegal(const ZLogLevel_t level) PURE_FUNC;
+static inline bool ZLog_LevelIsLegal(const ZLogLevel_t level) CONST_FUNC;
 #endif
-static inline bool ZLog_LevelPasses(const ZLogLevel_t level) CONST_FUNC;
+
+static inline bool ZLog_LevelPasses(const ZLogLevel_t level) PURE_FUNC;
 static inline const char * ZLog_LevelStr(const ZLogLevel_t level) CONST_FUNC;
 static inline void ZLog_StdFile(FILE *outfile, const ZLogLevel_t level, const char * const file,
                                 const int line, const char * const func, const char * const message);
@@ -58,7 +59,7 @@ static void ZLog_StdErr(const ZLogLevel_t level, const char * const file, const 
 static void ZLog_StdOut(const ZLogLevel_t level, const char * const file, const int line,
                         const char * const func, const char * const message) FUNC_MAYBE_UNUSED;
 #ifdef Z_CHECK_HAS_SYSLOG
-static inline int ZLog_Level2Syslog(const ZLogLevel_t level) PURE_FUNC;
+static inline int ZLog_Level2Syslog(const ZLogLevel_t level) CONST_FUNC;
 static void ZLog_Syslog(const ZLogLevel_t level, const char * const file, const int line,
                         const char * const func, const char * const message);
 #endif
