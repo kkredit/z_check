@@ -83,7 +83,7 @@ extern "C"
  */
 
 #define Z_CHECK_HAS_SYSLOG      /* SET -- comment out if syslog not supported */
-#define Z_CHECK_STATIC_CONFIG   /* SET -- comment out if using static config */
+#define Z_CHECK_STATIC_CONFIG   /* SET -- comment out if using dynamic config */
 
 #ifdef Z_CHECK_STATIC_CONFIG
     #undef Z_CHECK_HAS_SYSLOG
