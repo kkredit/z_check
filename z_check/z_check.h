@@ -94,7 +94,7 @@ extern "C"
     #define Z_CHECK_LOG_FUNC        Z_STDOUT    /* SET */
     #define Z_CHECK_INIT_LOG_LEVEL  Z_INFO      /* SET */
 #else
-    #define Z_CHECK_MODULE_NAME_MAX_LEN 16
+    #define Z_CHECK_MODULE_NAME_MAX_LEN 16      /* SET */
 #endif
 
 
