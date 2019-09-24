@@ -290,7 +290,7 @@ void ZLog_LevelReset(void);
  * \param[IN]   char * format: Error message
  */
 void ZLog(const ZLogLevel_t level, const char * const file, const int line, const char * const func,
-          const char * constformat, ...) __attribute__((format(printf, 5, 6)));
+          const char * const format, ...) __attribute__((format(printf, 5, 6)));
 
 
 /******************************************************************************

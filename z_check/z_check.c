@@ -159,7 +159,7 @@ void ZLog_LevelReset(void) {
 }
 
 void ZLog(const ZLogLevel_t level, const char * const file, const int line, const char * const func,
-          const char *format, ...) {
+          const char * const format, ...) {
 #ifndef Z_CHECK_STATIC_CONFIG
     if (NULL == m_ZLogFunc) {
         fprintf(stderr, "Error: May not use ZLog() before calling ZLog_Open()\n");
