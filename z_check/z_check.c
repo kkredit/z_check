@@ -69,7 +69,10 @@ static void ZLog_Syslog(const ZLogLevel_t level, const char * const file, const 
  *                                                                       Data */
 #ifndef Z_CHECK_STATIC_CONFIG
     /* Dynamically configured */
-    static char m_moduleName[Z_CHECK_MODULE_NAME_MAX_LEN] = {0};
+    static char m_moduleName[Z_CHECK_MODULE_NAME_MAX_LEN] = {0}; /* Flawfinder: ignore */
+        /* Warning: Statically-sized array
+           "Ignore" justification: we only write to it once using strncpy(sizeof(m_moduleName) -1)),
+           which writes a limited number of bits excluding the NULL terminator. */
     static ZLogFn_t m_ZLogFunc = NULL;
     static ZLogLevel_t m_logLevel;
     static ZLogLevel_t m_logLevelOrig;
@@ -170,17 +173,23 @@ void ZLog(const ZLogLevel_t level, const char * const file, const int line, cons
     if (ZLog_LevelPasses(level)) {
         int rc;
         va_list args;
-        char message[MESSAGE_MAX_LEN] = { 0 };
+        char message[MESSAGE_MAX_LEN] = {0}; /* Flawfinder: ignore */
+            /* Warning: Statically-sized array
+               "Ignore" justification: we only write to it once using vsnprintf(), which writes a
+               limited number of bits including the NULL terminator. */
 
         va_start(args, format);
-        rc = vsnprintf(message, MESSAGE_MAX_LEN, format, args);
+        rc = vsnprintf(message, MESSAGE_MAX_LEN - 1, format, args); /* Flawfinder: ignore */
+            /* Warning: use of "vsnprintf" and a user provided format
+               "Ignore" justification: leaving the message format to the caller is a required
+               feature. The code calling this is considered trusted. However, it is up to the
+               calling code to make sure the user cannot influence the format-string itself. */
         va_end(args);
 
-        if (-1 == rc) {
-            rc = snprintf(message, MESSAGE_MAX_LEN, "(failed to format message) %s", format);
+        if (0 > rc) {
+            m_ZLogFunc(level, file, line, func, "[z_check: failed to format message!]");
         }
-
-        if (0 < rc) {
+        else {
             m_ZLogFunc(level, file, line, func, message);
         }
     }
@@ -192,7 +201,10 @@ void ZLog(const ZLogLevel_t level, const char * const file, const int line, cons
 #ifndef Z_CHECK_STATIC_CONFIG
 static void ZLog_ModuleNameInit(const char * const moduleName) {
     const char * const moduleNameToUse = (NULL != moduleName) ? moduleName : DEFAULT_MODULE_NAME;
-    (void)strncpy(m_moduleName, moduleNameToUse, Z_CHECK_MODULE_NAME_MAX_LEN - 1);
+    (void)strncpy(m_moduleName, moduleNameToUse, sizeof(m_moduleName) - 1); /* Flawfinder: ignore */
+        /* Warning: use of "strncpy"
+           "Ignore" justification: we know that neither pointer is NULL, the target buffer has been
+           initialized to 0, and we are leaving room for the NULL terminator. */
 }
 
 static ZLogLevel_t ZLog_LevelSanitize(const ZLogLevel_t logLevel) {

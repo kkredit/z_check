@@ -290,7 +290,10 @@ void ZLog_LevelReset(void);
  * \param[IN]   char * format: Error message
  */
 void ZLog(const ZLogLevel_t level, const char * const file, const int line, const char * const func,
-          const char * const format, ...) __attribute__((format(printf, 5, 6)));
+          const char * const format, ...) __attribute__((format(printf, 5, 6))); /* Flawfinder: ignore */
+    /* Warning: use of "printf"
+       "Ignore" justification: seems like a misapplication of the rule. 'printf' is not a function
+       call here, but a function argument attribute. */
 
 
 /******************************************************************************

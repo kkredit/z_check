@@ -46,6 +46,10 @@ coverage:
 	lcov -c -d . -o $(BUILDDIR)/$(EXENAME).info
 	genhtml --legend -o $(BUILDDIR)/coveragereport $(BUILDDIR)/$(EXENAME).info
 
+.PHONY: check
+check:
+	flawfinder .
+
 $(EXENAME): $(OBJS)
 	$(CXX) -o $@ $(CFLAGS) $^ $(LDFLAGS)
 
