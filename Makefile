@@ -33,7 +33,7 @@ CFLAGS+=-Wall -Wextra -Wpedantic -Werror \
 		-O0 -ggdb3 \
 		-std=c99 -D_POSIX_C_SOURCE=200112L
 CFLAGS +=-Wunused-macros
-LDFLAGS+= $(foreach dir,$(INCDIRS),-I$(dir))
+LDFLAGS+= $(foreach dir,$(INCDIRS),-I$(dir)) -lbsd
 
 .PHONY: all
 all:

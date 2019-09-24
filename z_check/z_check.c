@@ -14,6 +14,7 @@
 #include "z_check.h"
 #include <stdio.h>
 #include <string.h>
+#include <bsd/string.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #ifdef Z_CHECK_HAS_SYSLOG
@@ -201,10 +202,7 @@ void ZLog(const ZLogLevel_t level, const char * const file, const int line, cons
 #ifndef Z_CHECK_STATIC_CONFIG
 static void ZLog_ModuleNameInit(const char * const moduleName) {
     const char * const moduleNameToUse = (NULL != moduleName) ? moduleName : DEFAULT_MODULE_NAME;
-    (void)strncpy(m_moduleName, moduleNameToUse, sizeof(m_moduleName) - 1); /* Flawfinder: ignore */
-        /* Warning: use of "strncpy"
-           "Ignore" justification: we know that neither pointer is NULL, the target buffer has been
-           initialized to 0, and we are leaving room for the NULL terminator. */
+    (void)strlcpy(m_moduleName, moduleNameToUse, sizeof(m_moduleName));
 }
 
 static ZLogLevel_t ZLog_LevelSanitize(const ZLogLevel_t logLevel) {
