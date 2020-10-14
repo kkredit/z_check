@@ -14,7 +14,9 @@
 #include "z_check.h"
 #include <stdio.h>
 #include <string.h>
+#ifdef USE_BSD
 #include <bsd/string.h>
+#endif
 #include <stdarg.h>
 #include <stdbool.h>
 #ifdef Z_CHECK_HAS_SYSLOG
